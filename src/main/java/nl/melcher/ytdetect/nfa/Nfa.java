@@ -10,7 +10,7 @@ public class Nfa {
 	/**
 	 * The NFA start state.
 	 */
-	private NfaState startState;
+	private final NfaState startState;
 
 	/**
 	 * The NFA state.
@@ -36,6 +36,7 @@ public class Nfa {
 	/**
 	 * Apply symbol to global NFA state.
 	 * @param symbol Applied symbol.
+	 * @return this.
 	 */
 	public Nfa next(Integer symbol) {
 		Set<NfaState> currentState = new HashSet<>();

@@ -15,7 +15,7 @@ import java.util.Set;
  */
 public class NfaState {
 
-	private Map<Integer, Set<NfaState>> symbolStateMap = new HashMap<>();
+	private final Map<Integer, Set<NfaState>> symbolStateMap = new HashMap<>();
 
 	/**
 	 * Retrieve the video associated with this state. May be null.

@@ -12,7 +12,7 @@ import java.util.Map;
  */
 public class NfaFactory {
 
-	private Map<VideoIdentifier, List<Integer>> videoMap = new HashMap<>();
+	private final Map<VideoIdentifier, List<Integer>> videoMap = new HashMap<>();
 
 	public void addVideo(@NonNull VideoIdentifier video, @NonNull List<Integer> segmentList) {
 		videoMap.put(video, segmentList);
