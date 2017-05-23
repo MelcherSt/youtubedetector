@@ -1,5 +1,7 @@
 package nl.melcher.ytdetect.nfa;
 
+import lombok.Getter;
+
 import java.util.*;
 
 /**
@@ -10,6 +12,7 @@ public class Nfa {
 	/**
 	 * The NFA start state.
 	 */
+	@Getter
 	private final NfaState startState;
 
 	/**

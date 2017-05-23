@@ -1,7 +1,6 @@
 package nl.melcher.ytdetect.nfa;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import nl.melcher.ytdetect.VideoIdentifier;
 
 import java.util.HashMap;

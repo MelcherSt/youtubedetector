@@ -16,8 +16,12 @@ public class SuperNfa {
 		this.startState = startState;
 	}
 
+	public SuperNfa(Nfa nfa) {
+		this.startState = nfa.getStartState();
+	}
+
 	/**
-	 * Apply symbol to current NFA state and add a new NFA starting from this symbol.
+	 * Apply symbol to current NFA state and initiate NFA starting from this symbol.
 	 * @param symbol Applied symbol.
 	 * @return this.
 	 */
@@ -31,6 +35,9 @@ public class SuperNfa {
 
 			if(nfa.getGlobalStateCount() == 1) {
 				// This NFA terminated!
+				System.out.println(nfa.hashCode() + "Result: " + ((NfaState)(nfa.getGlobalState().toArray()[0])).getVideoIdentifier().getTitle());
+			} else {
+				System.out.println(nfa.hashCode() + ": " + nfa.getGlobalState());
 			}
 
 			if(nfa.getGlobalStateCount() == 0) {
