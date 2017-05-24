@@ -3,6 +3,7 @@ package nl.melcher.ytdetect.nfa;
 import lombok.Getter;
 import nl.melcher.ytdetect.VideoIdentifier;
 
+import java.io.*;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -12,7 +13,7 @@ import java.util.Set;
  * A single state in the Nfa including transitions to other states for a given symbol.
  * Also includes a dedicated {@link nl.melcher.ytdetect.VideoIdentifier} to identify the video this state belongs to.
  */
-public class NfaState {
+public class NfaState implements Serializable {
 
 	private final Map<Integer, Set<NfaState>> symbolStateMap = new HashMap<>();
 
@@ -47,5 +48,29 @@ public class NfaState {
 			symbolStateMap.putIfAbsent(symbol, stateSet);
 		}
 		stateSet.add(state);
+	}
+
+	/**
+	 * Serialize this state and all of its child states.
+	 * @param fileName
+	 * @throws IOException
+	 */
+	public void serialize(String fileName) throws IOException {
+		try (ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(fileName))) {
+			outputStream.writeObject(this);
+		}
+	}
+
+	/**
+	 * Deserialize a state and its child states from file.
+	 * @param fileName
+	 * @return Nfastate
+	 * @throws IOException
+	 * @throws ClassNotFoundException
+	 */
+	public static NfaState deserialize(String fileName) throws IOException, ClassNotFoundException {
+		try(ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(fileName))) {
+			return (NfaState)inputStream.readObject();
+		}
 	}
 }

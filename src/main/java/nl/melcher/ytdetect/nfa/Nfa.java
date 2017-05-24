@@ -54,7 +54,7 @@ public class Nfa {
 	}
 
 	/**
-	 * Retrieve an exact copy of the current state.
+	 * Retrieve an unmodifiable copy of the current state.
 	 * @return Unmodifiable state set.
 	 */
 	public Set<NfaState> getGlobalState() {

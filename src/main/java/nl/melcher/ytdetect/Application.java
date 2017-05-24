@@ -1,14 +1,23 @@
 package nl.melcher.ytdetect;
 
+import nl.melcher.ytdetect.nfa.Nfa;
 import nl.melcher.ytdetect.nfa.NfaFactory;
+import nl.melcher.ytdetect.nfa.NfaState;
 import nl.melcher.ytdetect.nfa.SuperNfa;
+import nl.melcher.ytdetect.tui.InputHandler;
 
+import java.io.IOException;
 import java.util.Arrays;
 
 
 public class Application {
 
 	public static void main(String[] args) {
+
+		InputHandler inputHandler = new InputHandler();
+		inputHandler.handle(args);
+
+/*
 		VideoIdentifier videoGangnam = new VideoIdentifier("PSY - GANGNAM STYLE(강남스타일) M/V",
 				1080, 0, "https://www.youtube.com/watch?v=9bZkp7q19f0");
 
@@ -70,8 +79,34 @@ public class Application {
 		factory.addVideo(vidFake3, Arrays.asList(mocks3));
 		factory.addVideo(vidFake4, Arrays.asList(mocks4));
 
-		SuperNfa nfa = new SuperNfa(factory.build());
-		nfa.next(1779779).next(354029).next(359437).next(144059).next(365881).next(228181).next(304020);
+
+		Nfa nfa = factory.build();
+		NfaState startState = nfa.getStartState();
+
+		try {
+			startState.serialize("file.bin");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		try {
+			NfaState sStartState = NfaState.deserialize("file.bin");
+			SuperNfa sNfa = new SuperNfa(sStartState);
+
+			sNfa.next(1779779).next(354029).next(359437).next(144059).next(365881).next(228181).next(304020);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+
+
+
+*/
+
+
+
+
 
 		/*System.out.println("curstate:");
 		for(NfaState state : nfa.getGlobalState()) {

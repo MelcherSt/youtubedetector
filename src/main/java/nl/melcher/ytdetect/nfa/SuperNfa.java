@@ -1,10 +1,13 @@
 package nl.melcher.ytdetect.nfa;
 
+import nl.melcher.ytdetect.nfa.event.NfaEventSource;
+
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 /**
- * NFA Extraordinaire. Wraps around a set of {@link Nfa}
+ * NFA Extraordinaire. Wraps around a set of {@link Nfa}.
  */
 public class SuperNfa {
 
@@ -30,21 +33,24 @@ public class SuperNfa {
 		nfaSet.add(new Nfa(startState));
 
 		// Iterate and apply symbol transition
-		for(Nfa nfa : nfaSet) {
+		Iterator<Nfa> i = nfaSet.iterator();
+		while(i.hasNext()) {
+			Nfa nfa = i.next();
 			nfa.next(symbol);
 
 			if(nfa.getGlobalStateCount() == 1) {
 				// This NFA terminated!
-				System.out.println(nfa.hashCode() + "Result: " + ((NfaState)(nfa.getGlobalState().toArray()[0])).getVideoIdentifier().getTitle());
+				System.out.println("Result: " + ((NfaState)(nfa.getGlobalState().toArray()[0])).getVideoIdentifier().getTitle());
 			} else {
-				System.out.println(nfa.hashCode() + ": " + nfa.getGlobalState());
+				System.out.println(": " + nfa.getGlobalState());
 			}
 
 			if(nfa.getGlobalStateCount() == 0) {
-				// This NFA has no state
-				nfaSet.remove(nfa);
+				// This NFA has no state so remove it
+				i.remove();
 			}
 		}
+		System.out.println("=====================");
 		return this;
 	}
 }
