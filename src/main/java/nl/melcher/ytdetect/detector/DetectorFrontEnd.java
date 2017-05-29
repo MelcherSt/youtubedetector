@@ -1,20 +1,25 @@
 package nl.melcher.ytdetect.detector;
 
+import lombok.Getter;
 import nl.melcher.ytdetect.VideoIdentifier;
 import nl.melcher.ytdetect.fingerprinting.FingerprintFactory;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
- * Detector front end. Handles incoming segment sizes.
+ * Detector front end. Handles incoming segments. Singleton.
  */
 public class DetectorFrontEnd {
 
-	private List<VideoIdentifier> candidates = new ArrayList<>();
+	private Set<VideoIdentifier> candidates = new HashSet<>();
 
 	private LinkedList<Integer> segmentSizes = new LinkedList<>();
+
+	@Getter
+	public static DetectorFrontEnd instance = new DetectorFrontEnd();
+
+	private DetectorFrontEnd() {}
+
 
 	public void pushSegment(Integer segmentSize) {
 		// Push size
