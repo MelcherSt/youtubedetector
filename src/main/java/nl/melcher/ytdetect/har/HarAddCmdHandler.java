@@ -2,9 +2,12 @@ package nl.melcher.ytdetect.har;
 
 import de.sstoehr.harreader.HarReaderException;
 import nl.melcher.ytdetect.VideoIdentifier;
+import nl.melcher.ytdetect.fingerprinting.Fingerprint;
+import nl.melcher.ytdetect.fingerprinting.FingerprintFactory;
 import nl.melcher.ytdetect.tui.ICmdHandler;
 import nl.melcher.ytdetect.tui.InvalidArgumentsException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -16,7 +19,7 @@ public class HarAddCmdHandler implements ICmdHandler {
 		/*
 			Acceptable formats:
 			-h file.har -t "Video Name" -q 248 -aq 238 -u http://youtube.com/bla
-			--har file.har --title VideoTitle
+			--har file.har --title VideoTitle (TBD)
 		 */
 
 		// Validate arguments
@@ -26,8 +29,8 @@ public class HarAddCmdHandler implements ICmdHandler {
 
 		String harFile = args.get(0);
 		String vidTitle = null;
-		Integer vidQuality = 0;
-		Integer audQuality = 0;
+		Integer vidQuality = -1;
+		Integer vidLen = -1;
 		String vidUrl = "";
 
 		int index = -1;
@@ -50,28 +53,33 @@ public class HarAddCmdHandler implements ICmdHandler {
 			}
 		}
 
-		if((index = args.indexOf("-aq")) != -1) {
+		if((index = args.indexOf("-l")) != -1) {
 			try {
-				audQuality = Integer.valueOf(args.get(index + 1));
+				vidLen = Integer.valueOf(args.get(index + 1));
 			} catch(NumberFormatException ex) {
-				throw new InvalidArgumentsException("Audio quality should be an integer");
+				throw new InvalidArgumentsException("Length should be an integer");
 			}
 		}
 
-		// Create video id
-		VideoIdentifier vId = new VideoIdentifier(vidTitle, vidQuality, audQuality, vidUrl);
-
 		// Parse the HAR file and filter relevant information
+		List<Integer> segmentSizes = new ArrayList<>();
 		HarFilter harFilter = new HarFilter(harFile);
 		try {
-			List<Integer> segmentSizes = harFilter.filter();
-			for(Integer size : segmentSizes) {
-				System.out.print(size + ", ");
-			}
+			segmentSizes.addAll(harFilter.filter());
 		} catch (HarReaderException e) {
 			e.printStackTrace();
 		}
 
-		System.out.println(vId);
+		// Create video identifier
+		VideoIdentifier videoIdentifier = new VideoIdentifier(vidTitle, vidQuality, vidUrl, vidLen);
+
+		// Build fingerprints for video
+		FingerprintFactory fingerprintFactory = new FingerprintFactory(segmentSizes, videoIdentifier);
+		List<Fingerprint> fingerprints = fingerprintFactory.build();
+		for (Fingerprint fp : fingerprints) {
+			System.out.println(fp.toString());
+		}
+
+		videoIdentifier.setSegmentCount(fingerprints.size());
 	}
 }

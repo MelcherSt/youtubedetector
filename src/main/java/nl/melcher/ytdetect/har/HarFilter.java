@@ -19,7 +19,7 @@ public class HarFilter {
 	/**
 	 * Filter threshold for segments in bytes.
 	 */
-	private static final long SEGMENT_SIZE_THRESHOLD = 0;
+	private static final long SEGMENT_SIZE_THRESHOLD = 400000;
 
 	private final String harFileName;
 

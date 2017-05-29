@@ -1,28 +1,41 @@
 package nl.melcher.ytdetect;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
+import nl.melcher.ytdetect.fingerprinting.Fingerprint;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Identifies a YouTube video
  */
-@Data
-@AllArgsConstructor
-@RequiredArgsConstructor
 public class VideoIdentifier implements Serializable {
 
-	@NonNull
-	private String title;
-	private Integer videoQuality;
-	private Integer audioQuality = -1;
-	private String url = "";
+	@Getter	private String title;
+
+	/**
+	 * Video itag quality id.
+	 */
+	@Getter	private int videoQuality;
+
+	@Getter	private String url;
+
+	/**
+	 * Video length in seconds.
+	 */
+	@Getter private int length = 0;
+
+	@Setter @Getter private int segmentCount = 0;
+
+	public VideoIdentifier(String title, int videoQuality, String url, int length) {
+		this.title = title;
+		this.videoQuality = videoQuality;
+		this.url = url;
+		this.length = length;
+	}
 
 	@Override
 	public String toString() {
-		return "Title=" + title + ",VideoQuality=" + videoQuality + ",AudioQuality=" + audioQuality + ",Url=" + url;
+		return "VideoIdentifier[Title=" + title + ",VideoQuality=" + videoQuality + ",Length=" + length + ",Url=" + url + "]";
 	}
 }
