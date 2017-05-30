@@ -10,6 +10,7 @@ public class UsageCmdHandler implements ICmdHandler {
 	public void handle(List<String> args) {
 		System.out.println("Usage details");
 		System.out.println("===============");
-		System.out.println("Not available.");
+		System.out.println("-h / --har	:	Parse HAR file to fingerprints - stored this session");
+		System.out.println("-r / --real	:	Parse adudump output in realtime");
 	}
 }

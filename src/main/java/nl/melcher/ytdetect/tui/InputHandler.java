@@ -15,6 +15,8 @@ public class InputHandler {
 		// Register all available handlers
 		cmdHandlerMap.put("-h", HarAddCmdHandler.class);
 		cmdHandlerMap.put("--har", HarAddCmdHandler.class);
+		cmdHandlerMap.put("-r", RealTimeCmdHandler.class);
+		cmdHandlerMap.put("--real", RealTimeCmdHandler.class);
 	}
 
 	public void handle(String[] rawArgs) {

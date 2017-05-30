@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 /**
- * Created by melcher on 29-5-17.
+ * Build fingerprints of size {@value WINDOW_SIZE} from a list of segments.
  */
 public class FingerprintFactory {
 
