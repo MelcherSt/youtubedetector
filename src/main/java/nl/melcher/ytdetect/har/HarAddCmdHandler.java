@@ -78,6 +78,7 @@ public class HarAddCmdHandler implements ICmdHandler {
 		List<Fingerprint> fingerprints = fingerprintFactory.build();
 		for (Fingerprint fp : fingerprints) {
 			System.out.println(fp.toString());
+			System.out.println("Next expected fp index=" + fp.getNext().getStartIndex());
 		}
 
 		videoIdentifier.setSegmentCount(fingerprints.size());

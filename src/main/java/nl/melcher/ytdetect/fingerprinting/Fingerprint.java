@@ -1,6 +1,7 @@
 package nl.melcher.ytdetect.fingerprinting;
 
 import lombok.Getter;
+import lombok.Setter;
 import nl.melcher.ytdetect.VideoIdentifier;
 
 import java.io.Serializable;
@@ -32,6 +33,11 @@ public class Fingerprint implements Serializable, Comparable {
 	 * The actual video this fingerprint belongs to
 	 */
 	@Getter	private VideoIdentifier videoIdentifier;
+
+	/**
+	 * Expected next fingerprint without any overlap on this fingerprint. May be null.
+	 */
+	@Getter @Setter private Fingerprint next;
 
 	public Fingerprint(List<Integer> segmentSizeList, VideoIdentifier videoIdentifier, int startIndex, int endIndex) {
 		this.startIndex = startIndex;

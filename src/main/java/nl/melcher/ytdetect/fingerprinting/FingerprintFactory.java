@@ -3,7 +3,9 @@ package nl.melcher.ytdetect.fingerprinting;
 import nl.melcher.ytdetect.VideoIdentifier;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -34,11 +36,21 @@ public class FingerprintFactory {
 		int lastIndex = WINDOW_SIZE;
 		int firstIndex = 0;
 
+		// Create a mapping for assiging 'next' fp's
+		Map<Integer, Fingerprint> nextMap = new HashMap<>();
+
 		while(lastIndex < (segmentSizeList.size() + 1)) {
 			Fingerprint fp = new Fingerprint(segmentSizeList.subList(firstIndex, lastIndex), videoIdentifier, firstIndex, lastIndex);
 			fingerprints.add(fp);
+
+			if(nextMap.containsKey(firstIndex)) {
+				nextMap.get(firstIndex).setNext(fp);
+			}
+
 			firstIndex += 1;
 			lastIndex += 1;
+
+			nextMap.put(lastIndex, fp);
 		}
 
 		return fingerprints;

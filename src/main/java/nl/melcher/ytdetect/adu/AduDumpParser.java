@@ -14,19 +14,6 @@ import java.util.stream.Stream;
  */
 public class AduDumpParser {
 
-	public static void main(String[] args) {
-
-
-		/*try {
-			List<AduDumpLine> lines = parseFile("3-sorry.txt");
-			for(AduDumpLine line : lines) {
-				System.out.println(line);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}*/
-	}
-
 	/**
 	 * Parses a complete file.
 	 * @param fileName
