@@ -1,6 +1,7 @@
-package nl.melcher.ytdetect.tui;
+package nl.melcher.ytdetect.tui.handler;
 
 import nl.melcher.ytdetect.adu.AduDumpParser;
+import nl.melcher.ytdetect.tui.InvalidArgumentsException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,7 +12,7 @@ import java.util.List;
  * Parses incoming adudump lines in realtime
  * (when piped to adudump like to: "sudo ./adudump -l 192.168.1./16 if:enps0 | java -jar this.jar -r")
  */
-public class RealTimeCmdHandler implements ICmdHandler {
+public class RealTimeHandler implements ICmdHandler {
 	@Override
 	public void handle(List<String> args) throws InvalidArgumentsException {
 		// Create input source

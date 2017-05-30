@@ -32,7 +32,7 @@ public class DetectorBackEnd {
 	 * @param windowSize
 	 * @return
 	 */
-	public Set<Fingerprint> findBestMatches(int windowSize) {
+	public Set<Fingerprint> findMatches(int windowSize) {
 		// Define interval based on min/max TLS overhead -- removes HTTP header overhead as well
 		Double sizeMin = (windowSize / TLS_MIN) - (FingerprintFactory.WINDOW_SIZE * HTTP_HEADER);
 		Double sizeMax = (windowSize / TLS_MAX) - (FingerprintFactory.WINDOW_SIZE * HTTP_HEADER);

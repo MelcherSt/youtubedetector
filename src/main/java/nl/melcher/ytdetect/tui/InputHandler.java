@@ -1,7 +1,11 @@
 package nl.melcher.ytdetect.tui;
 
-import nl.melcher.ytdetect.har.HarAddCmdHandler;
+import nl.melcher.ytdetect.adu.AduDumpParser;
+import nl.melcher.ytdetect.tui.handler.*;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.*;
 
 /**
@@ -13,17 +17,24 @@ public class InputHandler {
 
 	{
 		// Register all available handlers
-		cmdHandlerMap.put("-h", HarAddCmdHandler.class);
-		cmdHandlerMap.put("--har", HarAddCmdHandler.class);
-		cmdHandlerMap.put("-r", RealTimeCmdHandler.class);
-		cmdHandlerMap.put("--real", RealTimeCmdHandler.class);
+		cmdHandlerMap.put("-a", HarAddHandler.class);
+		cmdHandlerMap.put("--add", HarAddHandler.class);
+		cmdHandlerMap.put("-r", RealTimeHandler.class);
+		cmdHandlerMap.put("--real", RealTimeHandler.class);
+		cmdHandlerMap.put("-s", FingerprintReposSaveHandler.class);
+		cmdHandlerMap.put("--save", FingerprintReposSaveHandler.class);
 	}
 
 	public void handle(String[] rawArgs) {
 		List<String> args = new LinkedList<String>(Arrays.asList(rawArgs));
-		Class<? extends ICmdHandler> clazz = cmdHandlerMap.getOrDefault(args.get(0), UsageCmdHandler.class);
-		args.remove(0);
+		if(args.size() < 1) {
+			args.add("");
+		} else if(args.get(0) == "q") {
+			return;
+		}
 
+		Class<? extends ICmdHandler> clazz = cmdHandlerMap.getOrDefault(args.get(0), UsageHandler.class);
+		args.remove(0);
 
 		try {
 			ICmdHandler cmdHandler = clazz.newInstance();
@@ -35,6 +46,15 @@ public class InputHandler {
 		} catch (InstantiationException e) {
 			e.printStackTrace();
 		}
+
+		System.out.println("Finished.");
+		BufferedReader f = new BufferedReader(new InputStreamReader(System.in));
+		try {
+			this.handle(f.readLine().split(" "));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 	}
 
 }

@@ -1,4 +1,6 @@
-package nl.melcher.ytdetect.tui;
+package nl.melcher.ytdetect.tui.handler;
+
+import nl.melcher.ytdetect.tui.InvalidArgumentsException;
 
 import java.util.List;
 

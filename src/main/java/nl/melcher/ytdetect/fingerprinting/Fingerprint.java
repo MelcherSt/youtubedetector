@@ -5,7 +5,9 @@ import lombok.Setter;
 import nl.melcher.ytdetect.VideoIdentifier;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Represents a section of segments of a video and as such fingerprints part of a video.

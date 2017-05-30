@@ -1,12 +1,11 @@
 package nl.melcher.ytdetect.fingerprinting;
 
+import com.google.common.collect.Multimap;
+import com.google.common.collect.TreeMultimap;
 import nl.melcher.ytdetect.VideoIdentifier;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
 /**
  * Build fingerprints of size {@value WINDOW_SIZE} from a list of segments.
@@ -21,14 +20,14 @@ public class FingerprintFactory {
 	 */
 	public static final int WINDOW_SIZE = 5;
 
-	public FingerprintFactory(List<Integer> segmentSizeList, VideoIdentifier videoIdentifier) {
+	public FingerprintFactory(ArrayList<Integer> segmentSizeList, VideoIdentifier videoIdentifier) {
 		this.segmentSizeList = segmentSizeList;
 	}
 
 	public List<Fingerprint> build() {
 		if (segmentSizeList.size() < WINDOW_SIZE) {
 			// That's no good
-			throw new RuntimeException("There are less segments than the window size. Cannot create fingerprints.");
+			throw new RuntimeException("There are less (" + segmentSizeList.size() + ") segments than the window size. Cannot create fingerprints.");
 		}
 
 		List<Fingerprint> fingerprints = new ArrayList<>();
@@ -37,19 +36,22 @@ public class FingerprintFactory {
 		int firstIndex = 0;
 
 		// Create a mapping for assiging 'next' fp's
-		Map<Integer, Fingerprint> nextMap = new HashMap<>();
+		Multimap<Integer, Fingerprint> nextMap = TreeMultimap.create();
 
 		while(lastIndex < (segmentSizeList.size() + 1)) {
-			Fingerprint fp = new Fingerprint(segmentSizeList.subList(firstIndex, lastIndex), videoIdentifier, firstIndex, lastIndex);
+			List<Integer> sublist = new ArrayList(segmentSizeList.subList(firstIndex, lastIndex));
+			Fingerprint fp = new Fingerprint(sublist, videoIdentifier, firstIndex, lastIndex);
 			fingerprints.add(fp);
 
+			// Assign this fp as next to earlier ones
 			if(nextMap.containsKey(firstIndex)) {
-				nextMap.get(firstIndex).setNext(fp);
+				nextMap.get(firstIndex).forEach(e -> e.setNext(fp));
 			}
 
 			firstIndex += 1;
 			lastIndex += 1;
 
+			// Add fp to receive its next
 			nextMap.put(lastIndex, fp);
 		}
 

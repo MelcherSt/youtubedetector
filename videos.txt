@@ -1,0 +1,20 @@
+1-gangnamstyle.har --title "PSY - GANGNAM STYLE(강남스타일) M/V" -q 248 -l 252 -u https://www.youtube.com/watch?v=9bZkp7q19f0
+2-seeyouagain.har --title "Wiz Khalifa - See You Again ft. Charlie Puth [Official Video] Furious 7 " -q 248 -l 237 -u https://www.youtube.com/watch?v=RgKAFK5djSk
+3-sorry.har --title "Justin Bieber - Sorry (PURPOSE : The Movement)" -q 248 -l 206 -u https://www.youtube.com/watch?v=fRh_vgS2dFE
+4-uptownfunk.har --title "Mark Ronson - Uptown Funk ft. Bruno Mars" -q 248 -l 271 -u https://www.youtube.com/watch?v=OPf0YbXqDm0
+#5-shakeitoff.har --title "Taylor Swift - Shake It Off" -q 248 -l 242 -l https://www.youtube.com/watch?v=nfWlot6h_JM
+6-bailando.har --title "Enrique Iglesias - Bailando (Español) ft. Descemer Bueno, Gente De Zona" -q 248 -l 287 -l https://www.youtube.com/watch?v=NUsoVlDFqZg
+7-blankspace.har --title "Taylor Swift - Blank Space" -q 248 -l 273 -u https://www.youtube.com/watch?v=e-ORhEE9VVg
+8-leanon.har --title "Major Lazer & DJ Snake - Lean On (feat. MØ) (Official Music Video)" -q 248 -l 178 -u https://www.youtube.com/watch?v=YqeW9_5kURI
+9-sugar.har --title "Maroon 5 - Sugar" -q 248 -l 301 -u https://www.youtube.com/watch?v=09R8_2nJtjg
+10-roar.har --title "Katy Perry - Roar (Official)" -q 248 -l 269 -u https://www.youtube.com/watch?v=CevxZvSJLk8&index=10
+11-hello.har --title "Adele - Hello" -q 248 -l 366 -u https://www.youtube.com/watch?v=YQHsXMglC9A
+12-allaboutthatbass.har --title "Meghan Trainor - All About That Bass" -q 248 -l 189 -u https://www.youtube.com/watch?v=7PCkvCPvDXk
+13-darkhorse.har --title "Katy Perry - Dark Horse (Official) ft. Juicy J" -q 248 -l 244 -u https://www.youtube.com/watch?v=0KSOMA3QBU0
+14-countingstars.har --title "OneRepublic - Counting Stars" -q 248 -l 283 -u https://www.youtube.com/watch?v=hT_nvWreIhg
+15-whatdoyoumean.har --title "Justin Bieber - What Do You Mean?" -q 248 -l 297 -u https://www.youtube.com/watch?v=DK_0jXPuIr0
+16-thinkingoutloud.har --title "Ed Sheeran - Thinking Out Loud [Official Video]" -q 248 -l 296 -u https://www.youtube.com/watch?v=lp-EO5I60KA
+17-baby.har --title "Justin Bieber - Baby ft. Ludacris" -q 244 -l 224 -u https://www.youtube.com/watch?v=kffacxfA7G4
+18-thisiswhatyoucamefor.har --title "Calvin Harris - This Is What You Came For (Official Video) ft. Rihanna" -q 248 -l 239 -u https://www.youtube.com/watch?v=kOkQ4T5WO9E
+19-chandelier.har --title "Sia - Chandelier (Official Video)" -q 248 -l 231 -u https://www.youtube.com/watch?v=2vjPBrBU-TM
+20-despacito.har --title "Luis Fonsi - Despacito ft. Daddy Yankee" -q 248 -l 281 -u https://www.youtube.com/watch?v=kJQP7kiw5Fk

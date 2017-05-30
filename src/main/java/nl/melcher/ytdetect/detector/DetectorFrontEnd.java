@@ -2,9 +2,7 @@ package nl.melcher.ytdetect.detector;
 
 import lombok.Getter;
 import nl.melcher.ytdetect.VideoIdentifier;
-import nl.melcher.ytdetect.fingerprinting.Fingerprint;
 import nl.melcher.ytdetect.fingerprinting.FingerprintFactory;
-import nl.melcher.ytdetect.fingerprinting.FingerprintUtils;
 
 import java.util.*;
 
@@ -37,11 +35,13 @@ public class DetectorFrontEnd {
 
 			// Send size to back end
 			//TODO: do back end things here...
-			DetectorBackEnd backEnd = new DetectorBackEnd(FingerprintUtils.fromFile("defaultfile.bin"));
-			Set<Fingerprint> candidates = backEnd.findBestMatches(size);
+			/*DetectorBackEnd backEnd = new DetectorBackEnd(FingerprintRepository.deserialize());
+			Set<Fingerprint> candidates = backEnd.findMatches(size);
 
 			// Intersect?
-
+			for(Fingerprint fp : candidates) {
+				System.out.println(fp);
+			}*/
 		}
 	}
 }
