@@ -15,7 +15,7 @@ import java.util.Set;
  */
 public class DetectorBackEnd {
 
-	private static final double TLS_MIN = 1.0019;
+	private static final double TLS_MIN = 1.0025;
 	private static final double TLS_MAX = 1.0017;
 	private static final int HTTP_HEADER = 525;
 
@@ -39,19 +39,14 @@ public class DetectorBackEnd {
 		Double sizeMin = (windowSize / TLS_MIN) - (FingerprintFactory.WINDOW_SIZE * HTTP_HEADER);
 		Double sizeMax = (windowSize / TLS_MAX) - (FingerprintFactory.WINDOW_SIZE * HTTP_HEADER);
 
-
+		Logger.log("========================");
 		Logger.log("Range search: [" + sizeMin + ", " + sizeMax + "]");
 
 		SortedMultiset<Integer> range = keys.subMultiset(sizeMin.intValue(), BoundType.OPEN, sizeMax.intValue(), BoundType.OPEN);
 		List<Fingerprint> resultFingerprints = new ArrayList<>();
 
-		for(Integer key : keys) {
-			//Logger.log("Key: " + key);
-		}
-
-
 		for(Integer key : range) {
-			Logger.log("found key match: " + key);
+			Logger.log("Matched key: " + key);
 
 			for(Fingerprint fp : rangeMap.get(key)) {
 				if (fp.getVideoIdentifier() != null) {
@@ -59,11 +54,10 @@ public class DetectorBackEnd {
 				} else {
 					Logger.log("Attached video is null");
 				}
-
 			}
-
 			resultFingerprints.addAll(rangeMap.get(key));
 		}
+		Logger.log("========================");
 		return resultFingerprints;
 	}
 

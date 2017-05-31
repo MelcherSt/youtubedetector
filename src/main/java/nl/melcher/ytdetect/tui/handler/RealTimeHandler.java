@@ -3,6 +3,8 @@ package nl.melcher.ytdetect.tui.handler;
 import nl.melcher.ytdetect.adu.AduDumpLine;
 import nl.melcher.ytdetect.adu.AduDumpParser;
 import nl.melcher.ytdetect.detector.DetectorFrontEnd;
+import nl.melcher.ytdetect.fingerprinting.FingerprintFactory;
+import nl.melcher.ytdetect.har.HarFilter;
 import nl.melcher.ytdetect.tui.InvalidArgumentsException;
 
 import java.io.BufferedReader;
@@ -17,6 +19,8 @@ import java.util.List;
 public class RealTimeHandler implements ICmdHandler {
 	@Override
 	public void handle(List<String> args) throws InvalidArgumentsException {
+		System.out.println("Real-time mode enabled");
+
 		// Create input source
 		BufferedReader f = new BufferedReader(new InputStreamReader(System.in));
 		DetectorFrontEnd frontEnd = DetectorFrontEnd.getInstance();
@@ -28,7 +32,10 @@ public class RealTimeHandler implements ICmdHandler {
 				AduDumpLine line = AduDumpParser.parseLine(f.readLine());
 				if(line.getType() == AduDumpLine.InferredType.ADU &&
 						line.getDirection() == AduDumpLine.Direction.INCOMING) {
-					frontEnd.pushSegment(line.getSize());
+
+					if(line.getSize() > HarFilter.SEGMENT_SIZE_THRESHOLD) {
+						frontEnd.pushSegment(line.getSize());
+					}
 				}
 			} catch (IOException e) {
 				System.out.println("Expected input, but there was none!");

@@ -38,25 +38,17 @@ public class DetectorFrontEnd {
 
 		// Push size
 		segmentSizes.add(segmentSize);
-		Logger.log("Fingerprint db: " + fingerprints.size());
-		Logger.log("Stack size: " + segmentSizes.size());
 
 		if(segmentSizes.size() >= FingerprintFactory.WINDOW_SIZE) {
 			// We have at least one complete window. Calculate total size.
 			int startIndex = segmentSizes.size() - FingerprintFactory.WINDOW_SIZE;
 			int endIndex = segmentSizes.size();
 			int size = segmentSizes.subList(startIndex, endIndex).stream().mapToInt(Integer::intValue).sum();
-			Logger.log("WindowSize: " + size);
+			Logger.log("Window frame size: " + size);
 
 			// Send size to back end
 			DetectorBackEnd backEnd = new DetectorBackEnd(fingerprints);
 			List<Fingerprint> matches = backEnd.findMatches(size);
-
-			for(Fingerprint fp : matches) {
-				System.out.println(fp);
-			}
 		}
-
-
 	}
 }

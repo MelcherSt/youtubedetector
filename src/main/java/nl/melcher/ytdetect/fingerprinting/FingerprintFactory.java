@@ -20,7 +20,7 @@ public class FingerprintFactory {
 	/**
 	 * Size of sliding window frames.
 	 */
-	public static final int WINDOW_SIZE = 5;
+	public static final int WINDOW_SIZE = 3;
 
 	public List<Fingerprint> build() {
 		if (segmentSizeList.size() < WINDOW_SIZE) {
