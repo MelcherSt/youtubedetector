@@ -19,7 +19,7 @@ public class Fingerprint implements Serializable, Comparable {
 	/**
 	 * Total size of the segments contained in fingerprint.
 	 */
-	@Getter	private int size;
+	@Getter	private int size = 0;
 
 	/**
 	 * Start segment no.

@@ -19,7 +19,7 @@ public class DetectorFrontEnd {
 
 	private LinkedList<Integer> segmentSizes = new LinkedList<>();
 
-	private List<DetectorBackEnd> backEnds = new ArrayList<>();
+	private Map<Integer, DetectorBackEnd> nextBackEndMap = new HashMap<>();
 
 	@Getter
 	public static DetectorFrontEnd instance = new DetectorFrontEnd();
@@ -44,11 +44,21 @@ public class DetectorFrontEnd {
 			int startIndex = segmentSizes.size() - FingerprintFactory.WINDOW_SIZE;
 			int endIndex = segmentSizes.size();
 			int size = segmentSizes.subList(startIndex, endIndex).stream().mapToInt(Integer::intValue).sum();
-			Logger.log("Window frame size: " + size);
 
-			// Send size to back end
+			// Create new back end. Add it to the map and get matches.
 			DetectorBackEnd backEnd = new DetectorBackEnd(fingerprints);
 			List<Fingerprint> matches = backEnd.findMatches(size);
+
+			if(matches.size() > 0) {
+				nextBackEndMap.put(endIndex + FingerprintFactory.WINDOW_SIZE, backEnd);
+			}
+
+			// Look for ordered next matches
+			if(nextBackEndMap.containsKey(startIndex)) {
+				Logger.log("!NEXT!");
+				DetectorBackEnd nextBackEnd = nextBackEndMap.get(startIndex);
+				List<Fingerprint> nextMatches = backEnd.findMatches(size);
+			}
 		}
 	}
 }
