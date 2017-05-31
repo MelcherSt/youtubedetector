@@ -2,6 +2,7 @@ package nl.melcher.ytdetect.fingerprinting;
 
 import com.google.common.collect.Multimap;
 import com.google.common.collect.TreeMultimap;
+import lombok.AllArgsConstructor;
 import nl.melcher.ytdetect.VideoIdentifier;
 
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ import java.util.List;
 /**
  * Build fingerprints of size {@value WINDOW_SIZE} from a list of segments.
  */
+@AllArgsConstructor
 public class FingerprintFactory {
 
 	private List<Integer> segmentSizeList;
@@ -20,18 +22,13 @@ public class FingerprintFactory {
 	 */
 	public static final int WINDOW_SIZE = 5;
 
-	public FingerprintFactory(ArrayList<Integer> segmentSizeList, VideoIdentifier videoIdentifier) {
-		this.segmentSizeList = segmentSizeList;
-	}
-
 	public List<Fingerprint> build() {
 		if (segmentSizeList.size() < WINDOW_SIZE) {
-			// That's no good
-			throw new RuntimeException("There are less (" + segmentSizeList.size() + ") segments than the window size. Cannot create fingerprints.");
+			throw new RuntimeException("There are less segments than the window size: "
+					+ segmentSizeList.size() + "/" + WINDOW_SIZE + ". Cannot create fingerprints.");
 		}
 
 		List<Fingerprint> fingerprints = new ArrayList<>();
-
 		int lastIndex = WINDOW_SIZE;
 		int firstIndex = 0;
 
@@ -54,10 +51,6 @@ public class FingerprintFactory {
 			// Add fp to receive its next
 			nextMap.put(lastIndex, fp);
 		}
-
 		return fingerprints;
 	}
-
-
-
 }

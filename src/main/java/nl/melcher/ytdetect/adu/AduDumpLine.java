@@ -1,6 +1,7 @@
 package nl.melcher.ytdetect.adu;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 /**
  * Partly representation of a single line of `adudump` output.
@@ -8,12 +9,12 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class AduDumpLine {
 
-	private InferredType type;
-	private String timestamp;
+	@Getter private InferredType type;
+	@Getter private String timestamp;
 	private String addrOne;
 	private String addrTwo;
-	private int size = 0;
-	private Direction direction;
+	@Getter private int size = 0;
+	@Getter private Direction direction;
 
 	public String getFromAddress() {
 		if(direction == Direction.INCOMING) {

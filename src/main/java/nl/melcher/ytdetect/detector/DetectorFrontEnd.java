@@ -2,8 +2,12 @@ package nl.melcher.ytdetect.detector;
 
 import lombok.Getter;
 import nl.melcher.ytdetect.VideoIdentifier;
+import nl.melcher.ytdetect.fingerprinting.Fingerprint;
 import nl.melcher.ytdetect.fingerprinting.FingerprintFactory;
+import nl.melcher.ytdetect.fingerprinting.FingerprintRepository;
+import nl.melcher.ytdetect.tui.utils.Logger;
 
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -20,28 +24,39 @@ public class DetectorFrontEnd {
 	@Getter
 	public static DetectorFrontEnd instance = new DetectorFrontEnd();
 
-	private DetectorFrontEnd() {}
+	private DetectorFrontEnd() {
+		try {
+			FingerprintRepository.deserialize(FingerprintRepository.FILE_NAME);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
 
 	public void pushSegment(Integer segmentSize) {
+		List<Fingerprint> fingerprints = FingerprintRepository.getFingerprints();
+
 		// Push size
-		segmentSizes.push(segmentSize);
+		segmentSizes.add(segmentSize);
+		Logger.log("Fingerprint db: " + fingerprints.size());
+		Logger.log("Stack size: " + segmentSizes.size());
 
 		if(segmentSizes.size() >= FingerprintFactory.WINDOW_SIZE) {
 			// We have at least one complete window. Calculate total size.
-			int size = segmentSizes
-					.subList(segmentSizes.size() - FingerprintFactory.WINDOW_SIZE, segmentSizes.size())
-					.stream().mapToInt(Integer::intValue).sum();
+			int startIndex = segmentSizes.size() - FingerprintFactory.WINDOW_SIZE;
+			int endIndex = segmentSizes.size();
+			int size = segmentSizes.subList(startIndex, endIndex).stream().mapToInt(Integer::intValue).sum();
+			Logger.log("WindowSize: " + size);
 
 			// Send size to back end
-			//TODO: do back end things here...
-			/*DetectorBackEnd backEnd = new DetectorBackEnd(FingerprintRepository.deserialize());
-			Set<Fingerprint> candidates = backEnd.findMatches(size);
+			DetectorBackEnd backEnd = new DetectorBackEnd(fingerprints);
+			List<Fingerprint> matches = backEnd.findMatches(size);
 
-			// Intersect?
-			for(Fingerprint fp : candidates) {
+			for(Fingerprint fp : matches) {
 				System.out.println(fp);
-			}*/
+			}
 		}
+
+
 	}
 }

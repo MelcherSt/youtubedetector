@@ -3,7 +3,9 @@ package nl.melcher.ytdetect.detector;
 import com.google.common.collect.*;
 import nl.melcher.ytdetect.fingerprinting.Fingerprint;
 import nl.melcher.ytdetect.fingerprinting.FingerprintFactory;
+import nl.melcher.ytdetect.tui.utils.Logger;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -32,15 +34,34 @@ public class DetectorBackEnd {
 	 * @param windowSize
 	 * @return
 	 */
-	public Set<Fingerprint> findMatches(int windowSize) {
+	public List<Fingerprint> findMatches(int windowSize) {
 		// Define interval based on min/max TLS overhead -- removes HTTP header overhead as well
 		Double sizeMin = (windowSize / TLS_MIN) - (FingerprintFactory.WINDOW_SIZE * HTTP_HEADER);
 		Double sizeMax = (windowSize / TLS_MAX) - (FingerprintFactory.WINDOW_SIZE * HTTP_HEADER);
 
-		SortedMultiset<Integer> range = keys.subMultiset(sizeMin.intValue(), BoundType.CLOSED, sizeMax.intValue(), BoundType.CLOSED);
-		Set<Fingerprint> resultFingerprints = new HashSet<>();
+
+		Logger.log("Range search: [" + sizeMin + ", " + sizeMax + "]");
+
+		SortedMultiset<Integer> range = keys.subMultiset(sizeMin.intValue(), BoundType.OPEN, sizeMax.intValue(), BoundType.OPEN);
+		List<Fingerprint> resultFingerprints = new ArrayList<>();
+
+		for(Integer key : keys) {
+			//Logger.log("Key: " + key);
+		}
+
 
 		for(Integer key : range) {
+			Logger.log("found key match: " + key);
+
+			for(Fingerprint fp : rangeMap.get(key)) {
+				if (fp.getVideoIdentifier() != null) {
+					Logger.log(fp.getVideoIdentifier().toString());
+				} else {
+					Logger.log("Attached video is null");
+				}
+
+			}
+
 			resultFingerprints.addAll(rangeMap.get(key));
 		}
 		return resultFingerprints;

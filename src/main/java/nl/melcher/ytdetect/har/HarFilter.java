@@ -6,14 +6,16 @@ import de.sstoehr.harreader.model.Har;
 import de.sstoehr.harreader.model.HarEntry;
 import de.sstoehr.harreader.model.HarLog;
 import de.sstoehr.harreader.model.HarResponse;
+import lombok.AllArgsConstructor;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Filter HAR file contents to only include relevant video data
+ * HAR filter.
  */
+@AllArgsConstructor
 public class HarFilter {
 
 	/**
@@ -23,10 +25,11 @@ public class HarFilter {
 
 	private final String harFileName;
 
-	public HarFilter(String fileName) {
-		this.harFileName = fileName;
-	}
-
+	/**
+	 * Filter HAR file.
+	 * @return All responses with size above {@value SEGMENT_SIZE_THRESHOLD} bytes.
+	 * @throws HarReaderException
+	 */
 	public List<Integer> filter() throws HarReaderException {
 		HarReader harReader = new HarReader();
 		List<Integer> segmentSizeList = new ArrayList<>();

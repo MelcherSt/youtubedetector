@@ -1,16 +1,14 @@
 package nl.melcher.ytdetect.fingerprinting;
 
 import java.io.*;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Manages {@link Fingerprint} and {@link nl.melcher.ytdetect.VideoIdentifier} instances for a session.
  */
 public class FingerprintRepository {
 
-	private static final Set<Fingerprint> FINGERPRINTS = new HashSet<>();
+	private static final List<Fingerprint> FINGERPRINTS = new ArrayList<>();
 	public static final String FILE_NAME = "fingerprints.bin";
 
 	public static void addFingerprint(Fingerprint fingerprint) {
@@ -26,10 +24,12 @@ public class FingerprintRepository {
 	 * @throws IOException
 	 * @throws ClassNotFoundException
 	 */
-	public static void deserialize(String fileName) throws IOException, ClassNotFoundException {
+	public static void deserialize(String fileName) throws IOException {
 		try(ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(fileName))) {
 			FINGERPRINTS.clear();
-			FINGERPRINTS.addAll((Set<Fingerprint>)inputStream.readObject());
+			FINGERPRINTS.addAll((List<Fingerprint>)inputStream.readObject());
+		} catch(ClassNotFoundException ex) {
+			// Ignore
 		}
 	}
 
@@ -44,7 +44,7 @@ public class FingerprintRepository {
 		}
 	}
 
-	public static Set<Fingerprint> getFingerprints() {
+	public static List<Fingerprint> getFingerprints() {
 		return FINGERPRINTS;
 	}
 }

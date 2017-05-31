@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Created by melcher on 30-5-17.
+ * Save all fingerprints currently in {@link FingerprintRepository}.
  */
 public class FingerprintReposSaveHandler implements ICmdHandler {
 	@Override

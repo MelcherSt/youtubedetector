@@ -9,7 +9,7 @@ import java.io.InputStreamReader;
 import java.util.*;
 
 /**
- * Created by melcher on 24-5-17.
+ * TUI Input handler.
  */
 public class InputHandler {
 

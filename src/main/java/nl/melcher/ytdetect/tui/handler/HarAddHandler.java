@@ -15,7 +15,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Add a video using HAR and video information
+ * Add a video using HAR and video information.
  */
 public class HarAddHandler implements ICmdHandler {
 
@@ -25,8 +25,8 @@ public class HarAddHandler implements ICmdHandler {
 	public void handle(List<String> args) throws InvalidArgumentsException {
 		/*
 			Acceptable formats:
-			-h file.har -t "Video Name" -q 248 -aq 238 -u http://youtube.com/bla
-			--har file.har -f videoinfo.txt
+			-h file.har -t "Video Name" -q 248 -l 238 -u http://youtube.com/bla
+			--har videos.txt
 		 */
 
 		// Validate arguments
