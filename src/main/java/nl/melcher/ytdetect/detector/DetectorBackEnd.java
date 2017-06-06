@@ -14,8 +14,8 @@ import java.util.stream.Collectors;
  */
 public class DetectorBackEnd {
 
-	private static final double TLS_MIN = 1.0019;
-	private static final double TLS_MAX = 1.0017;
+	private static final double TLS_MIN = 1.0021;
+	private static final double TLS_MAX = 1.0018;
 	private static final int HTTP_HEADER = 525;
 
 	private Multimap<Integer, Fingerprint> rangeMap = TreeMultimap.create();

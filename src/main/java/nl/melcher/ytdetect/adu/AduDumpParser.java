@@ -29,10 +29,10 @@ public class AduDumpParser {
 	 * @param aduDumpLine
 	 * @return
 	 */
-	public static AduDumpLine parseLine(String aduDumpLine) {
+	public static AduDumpLine parseLine(String aduDumpLine) throws MalformedAduLineException {
 		String[] parts = aduDumpLine.split(" ");
 		if (parts.length < 5) {
-			throw new RuntimeException("Malformed adudump line! A line should at least have 5 parts.");
+			throw new MalformedAduLineException("Malformed adudump line! A line should at least have 5 parts.");
 		}
 
 		// Get all the data

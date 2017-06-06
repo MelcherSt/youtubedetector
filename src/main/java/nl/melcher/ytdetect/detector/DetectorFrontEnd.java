@@ -5,6 +5,7 @@ import nl.melcher.ytdetect.VideoIdentifier;
 import nl.melcher.ytdetect.fingerprinting.Fingerprint;
 import nl.melcher.ytdetect.fingerprinting.FingerprintFactory;
 import nl.melcher.ytdetect.fingerprinting.FingerprintRepository;
+import nl.melcher.ytdetect.tui.InvalidArgumentsException;
 import nl.melcher.ytdetect.tui.utils.Logger;
 
 import java.io.IOException;
@@ -15,10 +16,8 @@ import java.util.*;
  */
 public class DetectorFrontEnd {
 
-	private Set<VideoIdentifier> candidates = new HashSet<>();
-
+	private Map<VideoIdentifier, Integer> candidates = new HashMap<>();
 	private LinkedList<Integer> segmentSizes = new LinkedList<>();
-
 	private Map<Integer, DetectorBackEnd> nextBackEndMap = new HashMap<>();
 
 	@Getter
@@ -49,6 +48,18 @@ public class DetectorFrontEnd {
 			DetectorBackEnd backEnd = new DetectorBackEnd(fingerprints);
 			List<Fingerprint> matches = backEnd.findMatches(size);
 
+			// Save candidates
+			for(Fingerprint match : matches) {
+				VideoIdentifier videoIdentifier = match.getVideoIdentifier();
+				if(candidates.containsKey(videoIdentifier)) {
+					candidates.put(videoIdentifier, candidates.get(videoIdentifier) +1);
+				} else {
+					candidates.put(videoIdentifier, 1);
+				}
+			}
+
+
+			// 'Next' fingerprint mechanism
 			if(matches.size() > 0) {
 				nextBackEndMap.put(endIndex + FingerprintFactory.WINDOW_SIZE, backEnd);
 			}
@@ -60,5 +71,20 @@ public class DetectorFrontEnd {
 				List<Fingerprint> nextMatches = backEnd.findMatches(size);
 			}
 		}
+	}
+
+	/**
+	 * Wrap things up. Report back stats and clear all maps for a fresh start.
+	 */
+	public void wrap() {
+		System.out.println("Total entries : " + candidates.values().stream().mapToInt(Integer::intValue).sum());
+		for(Map.Entry<VideoIdentifier, Integer> entry : candidates.entrySet()) {
+			System.out.println(entry.getKey().getTitle() + " : " + entry.getValue());
+		}
+
+		// Clear everything
+		candidates.clear();
+		segmentSizes.clear();
+		nextBackEndMap.clear();
 	}
 }

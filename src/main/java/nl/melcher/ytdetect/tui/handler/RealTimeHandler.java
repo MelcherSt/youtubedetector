@@ -2,6 +2,7 @@ package nl.melcher.ytdetect.tui.handler;
 
 import nl.melcher.ytdetect.adu.AduDumpLine;
 import nl.melcher.ytdetect.adu.AduDumpParser;
+import nl.melcher.ytdetect.adu.MalformedAduLineException;
 import nl.melcher.ytdetect.detector.DetectorFrontEnd;
 import nl.melcher.ytdetect.har.HarFilter;
 import nl.melcher.ytdetect.tui.InvalidArgumentsException;
@@ -28,13 +29,17 @@ public class RealTimeHandler implements ICmdHandler {
 		while(true) {
 			try {
 				// Parse lines and send to frontend for further processing
-				AduDumpLine line = AduDumpParser.parseLine(f.readLine());
-				if(line.getType() == AduDumpLine.InferredType.ADU &&
-						line.getDirection() == AduDumpLine.Direction.INCOMING) {
+				try {
+					AduDumpLine line = AduDumpParser.parseLine(f.readLine());
+					if(line.getType() == AduDumpLine.InferredType.ADU &&
+							line.getDirection() == AduDumpLine.Direction.INCOMING) {
 
-					if(line.getSize() > HarFilter.SEGMENT_SIZE_THRESHOLD) {
-						frontEnd.pushSegment(line.getSize());
+						if(line.getSize() > HarFilter.SEGMENT_SIZE_THRESHOLD) {
+							frontEnd.pushSegment(line.getSize());
+						}
 					}
+				} catch (MalformedAduLineException ex) {
+					frontEnd.wrap();
 				}
 			} catch (IOException e) {
 				System.out.println("Expected input, but there was none!");
