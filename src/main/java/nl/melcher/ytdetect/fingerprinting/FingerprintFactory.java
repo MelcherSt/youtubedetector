@@ -20,7 +20,8 @@ public class FingerprintFactory {
 	/**
 	 * Size of sliding window frames.
 	 */
-	public static final int WINDOW_SIZE = 10;
+	public static final int WINDOW_SIZE = 7;
+	public static final int NEXT_WINDOW_OVERLAP_FACTOR = WINDOW_SIZE / 2;
 
 	public List<Fingerprint> build() {
 		if (segmentSizeList.size() < WINDOW_SIZE) {
@@ -32,7 +33,7 @@ public class FingerprintFactory {
 		int lastIndex = WINDOW_SIZE;
 		int firstIndex = 0;
 
-		// Create a mapping for assiging 'next' fp's
+		// Create a mapping for assigning 'next' fp's
 		Multimap<Integer, Fingerprint> nextMap = TreeMultimap.create();
 
 		while(lastIndex < (segmentSizeList.size() + 1)) {
@@ -49,7 +50,7 @@ public class FingerprintFactory {
 			lastIndex += 1;
 
 			// Add fp to receive its next
-			nextMap.put(lastIndex, fp);
+			nextMap.put(lastIndex + NEXT_WINDOW_OVERLAP_FACTOR, fp);
 		}
 		return fingerprints;
 	}

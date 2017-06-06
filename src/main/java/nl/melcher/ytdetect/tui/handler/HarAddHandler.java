@@ -102,7 +102,7 @@ public class HarAddHandler implements ICmdHandler {
 		VideoIdentifier videoIdentifier = new VideoIdentifier(vidTitle, vidQuality, vidUrl, vidLen);
 
 		if(verbose) {
-			System.out.println("Created vId for " + videoIdentifier.getTitle());
+			System.out.println("Created vId: " + videoIdentifier.getTitle());
 		}
 
 		// Build fingerprints for video
@@ -114,10 +114,7 @@ public class HarAddHandler implements ICmdHandler {
 			// Add to repository
 			FingerprintRepository.addFingerprints(fingerprints);
 
-
-			if(verbose) {
-				System.out.println("--Created " + fingerprints.size() + " fingerprints!");
-			}
+			System.out.println("Created # of fingerprints: " + fingerprints.size());
 		} catch (RuntimeException e) {
 			System.out.println(e.getMessage());
 		}

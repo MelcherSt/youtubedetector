@@ -4,6 +4,7 @@ import com.google.common.collect.*;
 import nl.melcher.ytdetect.fingerprinting.Fingerprint;
 import nl.melcher.ytdetect.fingerprinting.FingerprintFactory;
 import nl.melcher.ytdetect.tui.utils.Logger;
+import sun.rmi.runtime.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +39,11 @@ public class DetectorBackEnd {
 
 		Logger.log("========================");
 		Logger.log("Gen:" + generation + ", fpDB: " + keys.size());
+		if(keys.size() < 20) {
+			for(int key : keys) {
+				Logger.log("fp size: " + key);
+			}
+		}
 		Logger.log("Frame size: " + frameSize + ",Range search: (" + sizeMin.intValue() + ", " + sizeMax.intValue() + ")");
 
 		SortedMultiset<Integer> range = keys.subMultiset(sizeMin.intValue(), BoundType.OPEN, sizeMax.intValue(), BoundType.OPEN);
