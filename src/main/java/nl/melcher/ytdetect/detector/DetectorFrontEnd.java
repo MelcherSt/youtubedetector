@@ -12,13 +12,17 @@ import java.io.IOException;
 import java.util.*;
 
 /**
- * Detector front end. Handles incoming segments. Singleton.
+ * Detector front end singleton. Handles incoming segments and controls instances of {@link DetectorBackEnd}.
+ * The front end oversees all incoming match information from back ends and constructs a list of video candidates
+ * based on this information.
  */
 public class DetectorFrontEnd {
 
 	private Map<VideoIdentifier, Integer> candidates = new HashMap<>();
 	private LinkedList<Integer> segmentSizes = new LinkedList<>();
 	private Map<Integer, DetectorBackEnd> nextBackEndMap = new HashMap<>();
+
+	private Map<VideoIdentifier, Integer> segmentOrder = new HashMap<>();
 
 	@Getter
 	public static DetectorFrontEnd instance = new DetectorFrontEnd();
@@ -32,6 +36,10 @@ public class DetectorFrontEnd {
 	}
 
 
+	/**
+	 * Push an incoming segment size for detection.
+	 * @param segmentSize
+	 */
 	public void pushSegment(Integer segmentSize) {
 		List<Fingerprint> fingerprints = FingerprintRepository.getFingerprints();
 
@@ -51,16 +59,28 @@ public class DetectorFrontEnd {
 			// Save candidates
 			for(Fingerprint match : matches) {
 				VideoIdentifier videoIdentifier = match.getVideoIdentifier();
+
 				if(candidates.containsKey(videoIdentifier)) {
 					candidates.put(videoIdentifier, candidates.get(videoIdentifier) +1);
 				} else {
 					candidates.put(videoIdentifier, 1);
 				}
+
+
+				if(segmentOrder.containsKey(videoIdentifier)) {
+					int lastEndindex = segmentOrder.get(videoIdentifier);
+					if (match.getEndIndex() < lastEndindex) {
+						// Discrepancy! Set this video back 1 place.
+						candidates.put(videoIdentifier, candidates.get(videoIdentifier) -1);
+					}
+				} else {
+					segmentOrder.put(videoIdentifier, match.getEndIndex());
+				}
 			}
 
 
 			// 'Next' fingerprint mechanism
-			if(matches.size() > 0) {
+		/*	if(matches.size() > 0) {
 				nextBackEndMap.put(endIndex + FingerprintFactory.WINDOW_SIZE, backEnd);
 			}
 
@@ -69,7 +89,7 @@ public class DetectorFrontEnd {
 				Logger.log("!NEXT!");
 				DetectorBackEnd nextBackEnd = nextBackEndMap.get(startIndex);
 				List<Fingerprint> nextMatches = backEnd.findMatches(size);
-			}
+			}*/
 		}
 	}
 
@@ -77,9 +97,13 @@ public class DetectorFrontEnd {
 	 * Wrap things up. Report back stats and clear all maps for a fresh start.
 	 */
 	public void wrap() {
-		System.out.println("Total entries : " + candidates.values().stream().mapToInt(Integer::intValue).sum());
+		int total = candidates.values().stream().mapToInt(Integer::intValue).sum();
+
+		System.out.println("Total entries : " + total);
 		for(Map.Entry<VideoIdentifier, Integer> entry : candidates.entrySet()) {
-			System.out.println(entry.getKey().getTitle() + " : " + entry.getValue());
+			double percentage = Double.valueOf(entry.getValue()) / total * 100;
+
+			System.out.println(entry.getKey().getTitle() + " : " + entry.getValue() + " (" + percentage + "%)");
 		}
 
 		// Clear everything

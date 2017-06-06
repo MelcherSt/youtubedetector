@@ -33,7 +33,6 @@ public class RealTimeHandler implements ICmdHandler {
 					AduDumpLine line = AduDumpParser.parseLine(f.readLine());
 					if(line.getType() == AduDumpLine.InferredType.ADU &&
 							line.getDirection() == AduDumpLine.Direction.INCOMING) {
-
 						if(line.getSize() > HarFilter.SEGMENT_SIZE_THRESHOLD) {
 							frontEnd.pushSegment(line.getSize());
 						}

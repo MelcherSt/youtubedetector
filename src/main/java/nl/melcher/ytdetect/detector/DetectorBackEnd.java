@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
  */
 public class DetectorBackEnd {
 
-	private static final double TLS_MIN = 1.0021;
+	private static final double TLS_MIN = 1.0023;
 	private static final double TLS_MAX = 1.0018;
 	private static final int HTTP_HEADER = 525;
 
@@ -47,6 +47,7 @@ public class DetectorBackEnd {
 			Logger.log("Matched key: " + key);
 
 			for(Fingerprint fp : rangeMap.get(key)) {
+				Logger.log("Index: " + fp.getEndIndex());
 				if (fp.getVideoIdentifier() != null) {
 					Logger.log(fp.getVideoIdentifier().toString());
 				} else {
@@ -86,10 +87,7 @@ public class DetectorBackEnd {
 			if(fp != null) {
 				rangeMap.put(fp.getSize(), fp);
 			}
-
 		}
 		createIndexes();
 	}
-
-
 }

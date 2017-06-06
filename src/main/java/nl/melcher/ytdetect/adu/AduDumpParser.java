@@ -32,7 +32,7 @@ public class AduDumpParser {
 	public static AduDumpLine parseLine(String aduDumpLine) throws MalformedAduLineException {
 		String[] parts = aduDumpLine.split(" ");
 		if (parts.length < 5) {
-			throw new MalformedAduLineException("Malformed adudump line! A line should at least have 5 parts.");
+			throw new MalformedAduLineException("A line should contain at least 5 parts of information.");
 		}
 
 		// Get all the data
