@@ -5,11 +5,12 @@ import nl.melcher.ytdetect.VideoIdentifier;
 import nl.melcher.ytdetect.fingerprinting.Fingerprint;
 import nl.melcher.ytdetect.fingerprinting.FingerprintFactory;
 import nl.melcher.ytdetect.fingerprinting.FingerprintRepository;
-import nl.melcher.ytdetect.tui.InvalidArgumentsException;
-import nl.melcher.ytdetect.tui.utils.Logger;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Detector front end singleton. Handles incoming segments and controls instances of {@link DetectorBackEnd}.
@@ -35,10 +36,9 @@ public class DetectorFrontEnd {
 		}
 	}
 
-
 	/**
 	 * Push an incoming segment size for detection.
-	 * @param segmentSize
+	 * @param segmentSize The size of a segment.
 	 */
 	public void pushSegment(Integer segmentSize) {
 		List<Fingerprint> fingerprints = FingerprintRepository.getFingerprints();
@@ -69,7 +69,7 @@ public class DetectorFrontEnd {
 
 				if(segmentOrder.containsKey(videoIdentifier)) {
 					int lastEndindex = segmentOrder.get(videoIdentifier);
-					if (match.getEndIndex() < lastEndindex) {
+					if (match.getEndIndex() <= lastEndindex) {
 						// Discrepancy! Set this video back 1 place.
 						candidates.put(videoIdentifier, candidates.get(videoIdentifier) -1);
 					}
@@ -109,6 +109,7 @@ public class DetectorFrontEnd {
 		// Clear everything
 		candidates.clear();
 		segmentSizes.clear();
+		segmentOrder.clear();
 		nextBackEndMap.clear();
 	}
 }

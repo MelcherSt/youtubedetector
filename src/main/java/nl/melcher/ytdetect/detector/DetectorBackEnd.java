@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Created by melcher on 29-5-17.
+ * Provides core segment matching facilities. Does the heavy lifting (range searching etc.).
  */
 public class DetectorBackEnd {
 
@@ -28,8 +28,8 @@ public class DetectorBackEnd {
 
 	/**
 	 * Find all fingerprints best matching the given window size.
-	 * @param frameSize
-	 * @return
+	 * @param frameSize The total size of the frame.
+	 * @return A list of matching fingerprints.
 	 */
 	public List<Fingerprint> findMatches(int frameSize) {
 		// Define interval based on min/max TLS overhead -- removes HTTP header overhead as well
