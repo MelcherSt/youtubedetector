@@ -3,7 +3,6 @@ package nl.melcher.ytdetect.tui.handler;
 import nl.melcher.ytdetect.adu.AduDumpLine;
 import nl.melcher.ytdetect.adu.AduDumpParser;
 import nl.melcher.ytdetect.detector.DetectorFrontEnd;
-import nl.melcher.ytdetect.fingerprinting.FingerprintFactory;
 import nl.melcher.ytdetect.har.HarFilter;
 import nl.melcher.ytdetect.tui.InvalidArgumentsException;
 
@@ -19,7 +18,7 @@ import java.util.List;
 public class RealTimeHandler implements ICmdHandler {
 	@Override
 	public void handle(List<String> args) throws InvalidArgumentsException {
-		System.out.println("Real-time mode enabled");
+		System.out.println("Real-time mode enabled. Awaiting input...");
 
 		// Create input source
 		BufferedReader f = new BufferedReader(new InputStreamReader(System.in));
