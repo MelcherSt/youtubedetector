@@ -1,7 +1,5 @@
 package nl.melcher.ytdetect.fingerprinting;
 
-import com.google.common.collect.Multimap;
-import com.google.common.collect.TreeMultimap;
 import lombok.AllArgsConstructor;
 import nl.melcher.ytdetect.VideoIdentifier;
 import nl.melcher.ytdetect.tui.utils.Logger;
@@ -17,7 +15,7 @@ import java.util.Map;
 @AllArgsConstructor
 public class FingerprintFactory {
 
-	private List<Integer> segmentSizeList;
+	private List<Integer> aduBytes;
 	private VideoIdentifier videoIdentifier;
 
 	/**
@@ -26,9 +24,9 @@ public class FingerprintFactory {
 	public static final int WINDOW_SIZE = 7;
 
 	public List<Fingerprint> build() {
-		if (segmentSizeList.size() < WINDOW_SIZE) {
+		if (aduBytes.size() < WINDOW_SIZE) {
 			throw new RuntimeException("There are less segments than the window size: "
-					+ segmentSizeList.size() + "/" + WINDOW_SIZE + ". Cannot create fingerprints.");
+					+ aduBytes.size() + "/" + WINDOW_SIZE + ". Cannot create fingerprints.");
 		}
 
 		List<Fingerprint> fingerprints = new ArrayList<>();
@@ -38,8 +36,8 @@ public class FingerprintFactory {
 		// Create a mapping for assigning 'next' fp's
 		Map<Integer, Fingerprint> nextMap = new HashMap<>();
 
-		while(lastIndex < (segmentSizeList.size() + 1)) {
-			List<Integer> sublist = new ArrayList(segmentSizeList.subList(firstIndex, lastIndex));
+		while(lastIndex < (aduBytes.size() + 1)) {
+			List<Integer> sublist = new ArrayList(aduBytes.subList(firstIndex, lastIndex));
 			Fingerprint fp = new Fingerprint(sublist, videoIdentifier, firstIndex, lastIndex);
 			fingerprints.add(fp);
 

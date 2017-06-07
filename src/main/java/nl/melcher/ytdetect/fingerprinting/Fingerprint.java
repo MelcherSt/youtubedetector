@@ -5,19 +5,20 @@ import lombok.Setter;
 import nl.melcher.ytdetect.VideoIdentifier;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Represents a section of segments of a video and as such fingerprints part of a video.
  */
 public class Fingerprint implements Serializable, Comparable {
 
-	private List<Integer> segmentSizeList;
+	/**
+	 * List of ADU sizes in bytes contained in fingerprint.
+	 */
+	private List<Integer> aduBytes;
 
 	/**
-	 * Total size of the segments contained in fingerprint.
+	 * Total size in bytes of all ADUs contained in fingerprint.
 	 */
 	@Getter	private int size = 0;
 
@@ -49,7 +50,7 @@ public class Fingerprint implements Serializable, Comparable {
 	public Fingerprint(List<Integer> segmentSizeList, VideoIdentifier videoIdentifier, int startIndex, int endIndex) {
 		this.startIndex = startIndex;
 		this.endIndex = endIndex;
-		this.segmentSizeList = segmentSizeList;
+		this.aduBytes = segmentSizeList;
 		this.videoIdentifier = videoIdentifier;
 		size = segmentSizeList.stream().mapToInt(Integer::intValue).sum();
 	}
@@ -59,7 +60,7 @@ public class Fingerprint implements Serializable, Comparable {
 		StringBuilder sb = new StringBuilder();
 		sb.append("Fingerprint[StartIndex=" + startIndex + ",EndIndex=" + endIndex + ",Size=" + size + ",Segments=");
 
-		for(Integer segmentSize : segmentSizeList) {
+		for(Integer segmentSize : aduBytes) {
 			sb.append(segmentSize + ",");
 		}
 

@@ -44,6 +44,10 @@ public class FingerprintRepository {
 		}
 	}
 
+	/**
+	 * Get a list of the currently loaded fingerprints.
+	 * @return The list of fingerprints.
+	 */
 	public static List<Fingerprint> getFingerprints() {
 		return FINGERPRINTS;
 	}
