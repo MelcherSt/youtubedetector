@@ -6,7 +6,7 @@ import nl.melcher.ytdetect.fingerprinting.Fingerprint;
 import nl.melcher.ytdetect.fingerprinting.FingerprintFactory;
 import nl.melcher.ytdetect.fingerprinting.FingerprintRepository;
 import nl.melcher.ytdetect.tui.utils.Logger;
-import sun.rmi.runtime.Log;
+import org.apache.commons.math3.stat.correlation.PearsonsCorrelation;
 
 import java.io.IOException;
 import java.util.*;
@@ -18,7 +18,7 @@ import java.util.*;
  */
 public class DetectorFrontEnd {
 
-	private static final int BONUS = 3;
+	private static final int BONUS = 4;
 
 	/**
 	 * List of incoming ADU sizes in bytes including any HTTP and/or TLS overhead still.
@@ -31,6 +31,10 @@ public class DetectorFrontEnd {
 	private Map<VideoIdentifier, Integer> candidateCountMap = new HashMap<>();
 
 	private Map<VideoIdentifier, Integer> aduOrder = new HashMap<>();
+
+	/**
+	 * List containing all candidates that were found in the last segment push.
+	 */
 	private List<VideoIdentifier> lastCandidates = new ArrayList<>();
 
 	@Getter	public static DetectorFrontEnd instance = new DetectorFrontEnd();
@@ -47,7 +51,7 @@ public class DetectorFrontEnd {
 	 * Push an incoming segment size for detection.
 	 * @param segmentSize The size of a segment.
 	 */
-	public void pushSegment(Integer segmentSize) {
+	public void pushAduSegment(Integer segmentSize) {
 		// Push size
 		aduBytes.add(segmentSize);
 
@@ -65,7 +69,13 @@ public class DetectorFrontEnd {
 			// Save candidateCountMap
 			for(Fingerprint match : matches) {
 				VideoIdentifier videoIdentifier = match.getVideoIdentifier();
+
+				if(newCandidates.contains(videoIdentifier)) {
+					// Do not process multiple matches for same video on single window
+					break;
+				}
 				newCandidates.add(videoIdentifier);
+
 
 				if(candidateCountMap.containsKey(videoIdentifier)) {
 					candidateCountMap.put(videoIdentifier, candidateCountMap.get(videoIdentifier) +1);
@@ -73,15 +83,14 @@ public class DetectorFrontEnd {
 					candidateCountMap.put(videoIdentifier, 1);
 				}
 
-
 				if(aduOrder.containsKey(videoIdentifier)) {
 					int lastEndindex = aduOrder.get(videoIdentifier);
 					if (match.getEndIndex() <= lastEndindex) {
-						// Discrepancy! Set this video back 1 place.
-						candidateCountMap.put(videoIdentifier, candidateCountMap.get(videoIdentifier) - 1);
+						// This ADU is completely out of order. Discrepancy detected!
+						candidateCountMap.put(videoIdentifier, candidateCountMap.get(videoIdentifier) - 2);
 					} else if(lastCandidates.contains(videoIdentifier)) {
 						if(match.getEndIndex() == lastEndindex + 1) {
-							// This is exactly the next expected segment. Bonus!
+							// This is exactly the ADU that is expected. Reward!
 							candidateCountMap.put(videoIdentifier, candidateCountMap.get(videoIdentifier) + BONUS);
 						}
 					}
@@ -90,6 +99,7 @@ public class DetectorFrontEnd {
 				}
 			}
 
+			// Empty and add all candidates found in this step
 			lastCandidates.clear();
 			lastCandidates.addAll(newCandidates);
 		}
@@ -99,6 +109,10 @@ public class DetectorFrontEnd {
 	 * Wrap things up. Report back stats and clear all maps for a fresh start.
 	 */
 	public void wrap() {
+		List<VideoIdentifier> toBeRemoved = new ArrayList<>();
+		candidateCountMap.entrySet().stream().forEach(e -> { if( e.getValue() < 0) { toBeRemoved.add(e.getKey());}});
+		toBeRemoved.stream().forEach(e -> { candidateCountMap.remove(e);});
+
 		int total = candidateCountMap.values().stream().mapToInt(Integer::intValue).sum();
 		Map<Integer, Set<VideoIdentifier>> countMap = new HashMap<>();
 
@@ -124,6 +138,8 @@ public class DetectorFrontEnd {
 			Logger.log("No results to report.");
 		}
 
+		calcCoefficient();
+
 		// Clear everything
 		candidateCountMap.clear();
 		aduBytes.clear();
@@ -131,6 +147,32 @@ public class DetectorFrontEnd {
 	}
 
 	private void calcCoefficient() {
+		// Prepare
+		List<Integer> windowBytes = calcWindowsFromInput();
+		Map<VideoIdentifier, List<Integer>> vidWindowBytesMap = new HashMap<>();
+		for (VideoIdentifier vid : candidateCountMap.keySet()) {
+			vidWindowBytesMap.put(vid, calcWindowsFromVid(vid));
+		}
+
+		/* Next part is only for debugging purposes */
+		StringBuilder sb = new StringBuilder();
+		for(Integer i : windowBytes) {
+			sb.append(i + ",");
+		}
+		Logger.log(sb.toString());
+
+		for(Map.Entry<VideoIdentifier, List<Integer>> entry : vidWindowBytesMap.entrySet()) {
+			sb = new StringBuilder(entry.getKey().toString() + ": ");
+			for(Integer i : entry.getValue()) {
+				sb.append(i + ",");
+			}
+			Logger.log(sb.toString());
+		}
+		/* end */
+
+		// Calculate pearson's value
+		PearsonsCorrelation pearsonsCorrelation = new PearsonsCorrelation();
+
 
 	}
 
@@ -138,7 +180,7 @@ public class DetectorFrontEnd {
 	 * Get a list of non-overlapping window sizes from the ADU input.
 	 * @return
 	 */
-	private List<Integer> calcWindows() {
+	private List<Integer> calcWindowsFromInput() {
 		List<Integer> result = new ArrayList<>();
 		int curWindowBytes = 0;
 		int curWindowSize = 0;
@@ -146,12 +188,24 @@ public class DetectorFrontEnd {
 		for (Integer adu : aduBytes) {
 			curWindowBytes += adu;
 			curWindowSize +=1;
-
 			if (curWindowSize == FingerprintFactory.WINDOW_SIZE) {
 				result.add(curWindowBytes);
 				curWindowBytes = 0;
 				curWindowSize = 0;
 			}
+		}
+		return result;
+	}
+
+	private List<Integer> calcWindowsFromVid(VideoIdentifier videoIdentifier) {
+		List<Integer> result = new ArrayList<>();
+		Fingerprint fp = videoIdentifier.getInitFingerprint();
+		result.add(fp.getSize());
+
+		while(fp.hasNext()) {
+			Fingerprint nextFp = fp.getNext();
+			result.add(nextFp.getSize());
+			fp = nextFp;
 		}
 		return result;
 	}

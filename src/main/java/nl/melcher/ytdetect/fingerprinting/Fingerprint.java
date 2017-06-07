@@ -55,6 +55,10 @@ public class Fingerprint implements Serializable, Comparable {
 		size = segmentSizeList.stream().mapToInt(Integer::intValue).sum();
 	}
 
+	public boolean hasNext() {
+		return next != null;
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();

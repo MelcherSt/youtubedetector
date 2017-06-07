@@ -11,7 +11,6 @@ import nl.melcher.ytdetect.tui.InvalidArgumentsException;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -109,7 +108,8 @@ public class HarAddHandler implements ICmdHandler {
 		try {
 			FingerprintFactory fingerprintFactory = new FingerprintFactory(segmentSizes, videoIdentifier);
 			List<Fingerprint> fingerprints = fingerprintFactory.build();
-			videoIdentifier.setSegmentCount(fingerprints.size());
+			videoIdentifier.setAduCount(fingerprints.size());
+			videoIdentifier.setInitFingerprint(fingerprints.get(0));
 
 			// Add to repository
 			FingerprintRepository.addFingerprints(fingerprints);

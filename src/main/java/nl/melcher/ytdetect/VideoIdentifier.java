@@ -25,7 +25,9 @@ public class VideoIdentifier implements Serializable {
 	 */
 	@Getter private int length = 0;
 
-	@Setter @Getter private int segmentCount = 0;
+	@Setter @Getter private int aduCount = 0;
+
+	@Setter @Getter private Fingerprint initFingerprint = null;
 
 	public VideoIdentifier(String title, int videoQuality, String url, int length) {
 		this.title = title;
