@@ -1,7 +1,5 @@
 package nl.melcher.ytdetect.detector;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
 import lombok.Getter;
 import nl.melcher.ytdetect.VideoIdentifier;
 import nl.melcher.ytdetect.fingerprinting.Fingerprint;
@@ -11,7 +9,6 @@ import nl.melcher.ytdetect.tui.utils.Logger;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Detector front end singleton. Handles incoming segments and controls instances of {@link DetectorBackEnd}.
@@ -52,7 +49,7 @@ public class DetectorFrontEnd {
 
 		if(segmentSizes.size() >= FingerprintFactory.WINDOW_SIZE) {
 			// We have at least one complete window. Calculate total size.
-			int startIndex = segmentSizes.size() - FingerprintFactory.WINDOW_SIZE;
+			int startIndex = segmentSizes.size() - FingerprintFactory.WINDOW_SIZE + 1;
 			int endIndex = segmentSizes.size();
 			int size = segmentSizes.subList(startIndex, endIndex).stream().mapToInt(Integer::intValue).sum();
 
@@ -92,10 +89,9 @@ public class DetectorFrontEnd {
 			lastCandidates.clear();
 			lastCandidates.addAll(newCandidates);
 
-
 			// 'Next' fingerprint mechanism
 			if(matches.size() > 0) {
-				nextBackEndMap.put(endIndex + (FingerprintFactory.NEXT_WINDOW_OVERLAP_FACTOR) , backEnd);
+				nextBackEndMap.put(endIndex + (FingerprintFactory.WINDOW_SIZE) , backEnd);
 			}
 
 			// Look for ordered next matches
@@ -137,5 +133,9 @@ public class DetectorFrontEnd {
 		segmentSizes.clear();
 		segmentOrder.clear();
 		nextBackEndMap.clear();
+	}
+
+	private void calcCoefficient() {
+
 	}
 }

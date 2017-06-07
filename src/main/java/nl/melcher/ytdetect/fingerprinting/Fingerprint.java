@@ -37,9 +37,14 @@ public class Fingerprint implements Serializable, Comparable {
 	@Getter	private VideoIdentifier videoIdentifier;
 
 	/**
-	 * Expected next fingerprint without any overlap on this fingerprint. May be null.
+	 * Next fingerprint without any overlap on this fingerprint. May be null.
 	 */
 	@Getter @Setter private Fingerprint next;
+
+	/**
+	 * Previous fingerprint without overlap with this fingerpints. May be null.
+	 */
+	@Getter @Setter private Fingerprint previous;
 
 	public Fingerprint(List<Integer> segmentSizeList, VideoIdentifier videoIdentifier, int startIndex, int endIndex) {
 		this.startIndex = startIndex;
@@ -58,7 +63,7 @@ public class Fingerprint implements Serializable, Comparable {
 			sb.append(segmentSize + ",");
 		}
 
-		sb.append("]");
+		sb.append(",NextIndex=" + ((next != null) ? next.getStartIndex() : "null") + "]");
 		return sb.toString();
 	}
 

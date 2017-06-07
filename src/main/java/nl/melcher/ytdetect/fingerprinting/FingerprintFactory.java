@@ -4,9 +4,12 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.TreeMultimap;
 import lombok.AllArgsConstructor;
 import nl.melcher.ytdetect.VideoIdentifier;
+import nl.melcher.ytdetect.tui.utils.Logger;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Build fingerprints of size {@value WINDOW_SIZE} from a list of segments.
@@ -21,7 +24,6 @@ public class FingerprintFactory {
 	 * Size of sliding window frames.
 	 */
 	public static final int WINDOW_SIZE = 7;
-	public static final int NEXT_WINDOW_OVERLAP_FACTOR = WINDOW_SIZE / 2;
 
 	public List<Fingerprint> build() {
 		if (segmentSizeList.size() < WINDOW_SIZE) {
@@ -30,11 +32,11 @@ public class FingerprintFactory {
 		}
 
 		List<Fingerprint> fingerprints = new ArrayList<>();
-		int lastIndex = WINDOW_SIZE;
+		int lastIndex = WINDOW_SIZE -1;
 		int firstIndex = 0;
 
 		// Create a mapping for assigning 'next' fp's
-		Multimap<Integer, Fingerprint> nextMap = TreeMultimap.create();
+		Map<Integer, Fingerprint> nextMap = new HashMap<>();
 
 		while(lastIndex < (segmentSizeList.size() + 1)) {
 			List<Integer> sublist = new ArrayList(segmentSizeList.subList(firstIndex, lastIndex));
@@ -43,15 +45,24 @@ public class FingerprintFactory {
 
 			// Assign this fp as next to earlier ones
 			if(nextMap.containsKey(firstIndex)) {
-				nextMap.get(firstIndex).forEach(e -> e.setNext(fp));
+				nextMap.get(firstIndex).setNext(fp);
 			}
+
+			if(nextMap.containsKey(firstIndex - 1 - WINDOW_SIZE)) {
+				fp.setPrevious(nextMap.get(firstIndex - 1 - WINDOW_SIZE));
+			}
+
+			// Add fp to receive its next
+			nextMap.put(lastIndex, fp);
 
 			firstIndex += 1;
 			lastIndex += 1;
-
-			// Add fp to receive its next
-			nextMap.put(lastIndex + NEXT_WINDOW_OVERLAP_FACTOR, fp);
 		}
+
+		for(Fingerprint fp : fingerprints) {
+			Logger.log(fp.toString());
+		}
+
 		return fingerprints;
 	}
 }
