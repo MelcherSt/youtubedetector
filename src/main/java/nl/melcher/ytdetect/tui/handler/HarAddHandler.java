@@ -7,6 +7,7 @@ import nl.melcher.ytdetect.fingerprinting.FingerprintFactory;
 import nl.melcher.ytdetect.fingerprinting.FingerprintRepository;
 import nl.melcher.ytdetect.har.HarFilter;
 import nl.melcher.ytdetect.tui.InvalidArgumentsException;
+import nl.melcher.ytdetect.tui.utils.Logger;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -18,15 +19,11 @@ import java.util.List;
  */
 public class HarAddHandler implements ICmdHandler {
 
-	private boolean verbose = true;
-
 	@Override
 	public void handle(List<String> args) throws InvalidArgumentsException {
-		/*
-			Acceptable formats:
-			-h file.har -t "Video Name" -q 248 -l 238 -u http://youtube.com/bla
-			--har videos.txt
-		 */
+		/* Acceptable formats:
+		-a file.har -t "Video Name" -q 248 -l 238 -u http://youtube.com/bla
+		--add videos.txt */
 
 		// Validate arguments
 		if(args.size() < 1 || args.size() > 9) {
@@ -52,8 +49,6 @@ public class HarAddHandler implements ICmdHandler {
 	}
 
 	private void handleLine(List<String> args)  throws InvalidArgumentsException {
-
-
 		String harFile = args.get(0);
 		String vidTitle = null;
 		Integer vidQuality = -1;
@@ -89,20 +84,17 @@ public class HarAddHandler implements ICmdHandler {
 		}
 
 		// Parse the HAR file and filter relevant information
-		ArrayList<Integer> segmentSizes = new ArrayList<>();
+		List<Integer> segmentSizes = new ArrayList<>();
 		HarFilter harFilter = new HarFilter(harFile);
 		try {
 			segmentSizes.addAll(harFilter.filter());
+
 		} catch (HarReaderException e) {
 			throw new InvalidArgumentsException("An error occurred while reading HAR file: " + e.getMessage());
 		}
 
 		// Create video identifier
 		VideoIdentifier videoIdentifier = new VideoIdentifier(vidTitle, vidQuality, vidUrl, vidLen);
-
-		if(verbose) {
-			System.out.println("Created vId: " + videoIdentifier.getTitle());
-		}
 
 		// Build fingerprints for video
 		try {
@@ -114,7 +106,9 @@ public class HarAddHandler implements ICmdHandler {
 			// Add to repository
 			FingerprintRepository.addFingerprints(fingerprints);
 
-			System.out.println("Created # of fingerprints: " + fingerprints.size());
+			Logger.log("");
+			Logger.log("Created " + fingerprints.size() + " fingerprints for video " + vidTitle + "/" + vidLen + "/" + vidQuality);
+			Logger.log("------");
 		} catch (RuntimeException e) {
 			System.out.println(e.getMessage());
 		}

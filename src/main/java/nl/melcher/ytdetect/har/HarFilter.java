@@ -7,6 +7,7 @@ import de.sstoehr.harreader.model.HarEntry;
 import de.sstoehr.harreader.model.HarLog;
 import de.sstoehr.harreader.model.HarResponse;
 import lombok.AllArgsConstructor;
+import nl.melcher.ytdetect.tui.utils.Logger;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -24,6 +25,8 @@ public class HarFilter {
 	public static final long SEGMENT_SIZE_THRESHOLD = 400000;
 
 	private final String harFileName;
+
+	private final boolean showSegmentSizes = true;
 
 	/**
 	 * Filter HAR file.
@@ -43,6 +46,12 @@ public class HarFilter {
 				/* Generally, we aren't dealing with values
 				 great than INT.MAX_VALUE so it's save to cast */
 				segmentSizeList.add(segmentSize.intValue());
+
+				// Print the individual ADU segment sizes
+				if(showSegmentSizes) {
+					System.out.print(segmentSize.intValue() + ", ");
+				}
+
 			}
 		}
 		return segmentSizeList;

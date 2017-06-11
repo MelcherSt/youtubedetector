@@ -2,6 +2,7 @@ package nl.melcher.ytdetect.detector;
 
 import lombok.Getter;
 import nl.melcher.ytdetect.VideoIdentifier;
+import nl.melcher.ytdetect.adu.AduDumpLine;
 import nl.melcher.ytdetect.fingerprinting.Fingerprint;
 import nl.melcher.ytdetect.fingerprinting.FingerprintFactory;
 import nl.melcher.ytdetect.fingerprinting.FingerprintRepository;
@@ -161,18 +162,37 @@ public class DetectorFrontEnd {
 		}
 		Logger.log(sb.toString());
 
+		/* end */
+
+		// Calculate pearson's value
+		PearsonsCorrelation pearsonsCorrelation = new PearsonsCorrelation();
+
 		for(Map.Entry<VideoIdentifier, List<Integer>> entry : vidWindowBytesMap.entrySet()) {
 			sb = new StringBuilder(entry.getKey().toString() + ": ");
 			for(Integer i : entry.getValue()) {
 				sb.append(i + ",");
 			}
 			Logger.log(sb.toString());
+
+			List<Integer> vidWindowBytes = entry.getValue();
+			if(vidWindowBytes.size() < windowBytes.size()) {
+				continue;
+			}
+
+			int startIndex = 0;
+
+			while(windowBytes.size() + startIndex < vidWindowBytes.size()) {
+				List<Integer> subVidWindowBytes = vidWindowBytes.subList(startIndex, windowBytes.size() + startIndex);
+
+				double corell = pearsonsCorrelation.correlation(windowBytes.stream().mapToDouble(Integer::doubleValue).toArray(),
+						subVidWindowBytes.stream().mapToDouble(Integer::doubleValue).toArray());
+				Logger.log(entry.getKey() + " Corell: " + corell);
+				startIndex += 1;
+			}
+
+
+
 		}
-		/* end */
-
-		// Calculate pearson's value
-		PearsonsCorrelation pearsonsCorrelation = new PearsonsCorrelation();
-
 
 	}
 

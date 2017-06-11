@@ -25,8 +25,8 @@ public class FingerprintFactory {
 
 	public List<Fingerprint> build() {
 		if (aduBytes.size() < WINDOW_SIZE) {
-			throw new RuntimeException("There are less segments than the window size: "
-					+ aduBytes.size() + "/" + WINDOW_SIZE + ". Cannot create fingerprints.");
+			throw new RuntimeException("Cannot create fingerprints: there not enough ADUs to fill a single window. Received: "
+					+ aduBytes.size() + " Expected: " + WINDOW_SIZE);
 		}
 
 		List<Fingerprint> fingerprints = new ArrayList<>();
@@ -56,11 +56,6 @@ public class FingerprintFactory {
 			firstIndex += 1;
 			lastIndex += 1;
 		}
-
-		for(Fingerprint fp : fingerprints) {
-			Logger.log(fp.toString());
-		}
-
 		return fingerprints;
 	}
 }
