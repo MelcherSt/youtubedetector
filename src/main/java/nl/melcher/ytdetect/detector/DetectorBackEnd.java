@@ -15,13 +15,12 @@ import java.util.stream.Collectors;
  */
 public class DetectorBackEnd {
 
-	private static final double TLS_MIN = 1.0023;
-	private static final double TLS_MAX = 1.0018;
+	private static final double TLS_MIN = 1.0019;
+	private static final double TLS_MAX = 1.0017;
 	private static final int HTTP_HEADER = 525;
 
 	private Multimap<Integer, Fingerprint> rangeMap = TreeMultimap.create();
 	private SortedMultiset<Integer> keys = TreeMultiset.create();
-	private int generation = 0;
 
 	public DetectorBackEnd(List<Fingerprint> fingerprints) {
 		populateFingerprints(fingerprints);
@@ -37,44 +36,20 @@ public class DetectorBackEnd {
 		Double sizeMin = (frameSize / TLS_MIN) - (FingerprintFactory.WINDOW_SIZE * HTTP_HEADER);
 		Double sizeMax = (frameSize / TLS_MAX) - (FingerprintFactory.WINDOW_SIZE * HTTP_HEADER);
 
-		Logger.log("========================");
-		Logger.log("Gen:" + generation + ", fpDB: " + keys.size());
-		if(keys.size() < 20) {
-			for(int key : keys) {
-				Logger.log("fp size: " + key);
-			}
-		}
-		Logger.log("Frame size: " + frameSize + ",Range search: (" + sizeMin.intValue() + ", " + sizeMax.intValue() + ")");
-
 		SortedMultiset<Integer> range = keys.subMultiset(sizeMin.intValue(), BoundType.OPEN, sizeMax.intValue(), BoundType.OPEN);
 		List<Fingerprint> resultFingerprints = new ArrayList<>();
+
+		Logger.log("Frame size: " + frameSize + ", Range search: (" + sizeMin.intValue() + ", " + sizeMax.intValue() + ")");
 
 		for(Integer key : range) {
 			Logger.log("Matched key: " + key);
 
 			for(Fingerprint fp : rangeMap.get(key)) {
-				Logger.log("Index: " + fp.getEndIndex());
-				if (fp.getVideoIdentifier() != null) {
-					Logger.log(fp.getVideoIdentifier().toString());
-				} else {
-					Logger.log("Reference to video is null!");
-				}
+				Logger.log("Index: " + fp.getEndIndex() + " Vid: " + fp.getVideoIdentifier().getTitle());
 			}
 			resultFingerprints.addAll(rangeMap.get(key));
 		}
-
 		Logger.log("========================");
-
-		// Set-up this backend for the next generation
-
-		if(resultFingerprints.size() != 0) {
-			List<Fingerprint> nextFingerprints = resultFingerprints.stream()
-					.map(e -> { return e.getNext();}).collect(Collectors.toList());
-			populateFingerprints(nextFingerprints);
-			generation += 1;
-		} else {
-			generation = -1;
-		}
 
 		return resultFingerprints;
 	}

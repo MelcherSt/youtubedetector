@@ -2,7 +2,6 @@ package nl.melcher.ytdetect.detector;
 
 import lombok.Getter;
 import nl.melcher.ytdetect.VideoIdentifier;
-import nl.melcher.ytdetect.adu.AduDumpLine;
 import nl.melcher.ytdetect.fingerprinting.Fingerprint;
 import nl.melcher.ytdetect.fingerprinting.FingerprintFactory;
 import nl.melcher.ytdetect.fingerprinting.FingerprintRepository;
@@ -77,7 +76,6 @@ public class DetectorFrontEnd {
 				}
 				newCandidates.add(videoIdentifier);
 
-
 				if(candidateCountMap.containsKey(videoIdentifier)) {
 					candidateCountMap.put(videoIdentifier, candidateCountMap.get(videoIdentifier) +1);
 				} else {
@@ -137,6 +135,10 @@ public class DetectorFrontEnd {
 
 		if(aduBytes.size() < FingerprintFactory.WINDOW_SIZE) {
 			Logger.log("No results to report.");
+		} else {
+			for(Integer aduSegment : aduBytes) {
+				System.out.print(aduSegment + ", ");
+			}
 		}
 
 		calcCoefficient();
@@ -189,15 +191,12 @@ public class DetectorFrontEnd {
 				Logger.log(entry.getKey() + " Corell: " + corell);
 				startIndex += 1;
 			}
-
-
-
 		}
 
 	}
 
 	/**
-	 * Get a list of non-overlapping window sizes from the ADU input.
+	 * Get a list of non-overlapping window sizes from the ADU input on the detector.
 	 * @return
 	 */
 	private List<Integer> calcWindowsFromInput() {
@@ -217,6 +216,11 @@ public class DetectorFrontEnd {
 		return result;
 	}
 
+	/**
+	 * Get a list of non-overlapping windows sizes for a video.
+	 * @param videoIdentifier
+	 * @return
+	 */
 	private List<Integer> calcWindowsFromVid(VideoIdentifier videoIdentifier) {
 		List<Integer> result = new ArrayList<>();
 		Fingerprint fp = videoIdentifier.getInitFingerprint();
