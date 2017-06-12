@@ -30,7 +30,7 @@ public class DetectorFrontEnd {
 	 */
 	private Map<VideoIdentifier, Integer> candidateCountMap = new HashMap<>();
 
-	private Map<VideoIdentifier, Integer> aduOrder = new HashMap<>();
+	private Map<VideoIdentifier, Integer> aduSegmentOrder = new HashMap<>();
 
 	/**
 	 * List containing all candidates that were found in the last segment push.
@@ -66,7 +66,7 @@ public class DetectorFrontEnd {
 			List<Fingerprint> matches = backEnd.findMatches(size);
 			List<VideoIdentifier> newCandidates = new ArrayList<>();
 
-			// Save candidateCountMap
+			// Handle all matches
 			for(Fingerprint match : matches) {
 				VideoIdentifier videoIdentifier = match.getVideoIdentifier();
 
@@ -82,20 +82,19 @@ public class DetectorFrontEnd {
 					candidateCountMap.put(videoIdentifier, 1);
 				}
 
-				if(aduOrder.containsKey(videoIdentifier)) {
-					int lastEndindex = aduOrder.get(videoIdentifier);
+				if(aduSegmentOrder.containsKey(videoIdentifier)) {
+					int lastEndindex = aduSegmentOrder.get(videoIdentifier);
 					if (match.getEndIndex() <= lastEndindex) {
-						// This ADU is completely out of order. Discrepancy detected!
+						// ADU segment completely out of order.
 						candidateCountMap.put(videoIdentifier, candidateCountMap.get(videoIdentifier) - 2);
-					} else if(lastCandidates.contains(videoIdentifier)) {
-						if(match.getEndIndex() == lastEndindex + 1) {
-							// This is exactly the ADU that is expected. Reward!
-							candidateCountMap.put(videoIdentifier, candidateCountMap.get(videoIdentifier) + BONUS);
-						}
+					} else if(lastCandidates.contains(videoIdentifier) && match.getEndIndex() == lastEndindex + 1) {
+						// Exact match of expected ADU segment. Reward.
+						candidateCountMap.put(videoIdentifier, candidateCountMap.get(videoIdentifier) + BONUS);
 					}
-				} else {
-					aduOrder.put(videoIdentifier, match.getEndIndex());
 				}
+
+				// Update last seen index for this video
+				aduSegmentOrder.put(videoIdentifier, match.getEndIndex());
 			}
 
 			// Empty and add all candidates found in this step
@@ -146,7 +145,7 @@ public class DetectorFrontEnd {
 		// Clear everything
 		candidateCountMap.clear();
 		aduBytes.clear();
-		aduOrder.clear();
+		aduSegmentOrder.clear();
 	}
 
 	private void calcCoefficient() {
