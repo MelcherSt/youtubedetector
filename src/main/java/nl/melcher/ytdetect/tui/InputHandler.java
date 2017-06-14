@@ -1,6 +1,5 @@
 package nl.melcher.ytdetect.tui;
 
-import nl.melcher.ytdetect.adu.AduDumpParser;
 import nl.melcher.ytdetect.tui.handler.*;
 
 import java.io.BufferedReader;
@@ -21,8 +20,8 @@ public class InputHandler {
 		cmdHandlerMap.put("--add", HarAddHandler.class);
 		cmdHandlerMap.put("-r", RealTimeHandler.class);
 		cmdHandlerMap.put("--real", RealTimeHandler.class);
-		cmdHandlerMap.put("-s", FingerprintReposSaveHandler.class);
-		cmdHandlerMap.put("--save", FingerprintReposSaveHandler.class);
+		cmdHandlerMap.put("-s", WindowReposSaveHandler.class);
+		cmdHandlerMap.put("--save", WindowReposSaveHandler.class);
 	}
 
 	public void handle(String[] rawArgs) {

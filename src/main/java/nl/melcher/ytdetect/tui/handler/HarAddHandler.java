@@ -2,9 +2,9 @@ package nl.melcher.ytdetect.tui.handler;
 
 import de.sstoehr.harreader.HarReaderException;
 import nl.melcher.ytdetect.VideoIdentifier;
-import nl.melcher.ytdetect.fingerprinting.Fingerprint;
-import nl.melcher.ytdetect.fingerprinting.FingerprintFactory;
-import nl.melcher.ytdetect.fingerprinting.FingerprintRepository;
+import nl.melcher.ytdetect.fingerprinting.Window;
+import nl.melcher.ytdetect.fingerprinting.WindowFactory;
+import nl.melcher.ytdetect.fingerprinting.WindowRepository;
 import nl.melcher.ytdetect.har.HarFilter;
 import nl.melcher.ytdetect.tui.InvalidArgumentsException;
 import nl.melcher.ytdetect.tui.utils.Logger;
@@ -83,11 +83,11 @@ public class HarAddHandler implements ICmdHandler {
 			}
 		}
 
-		// Parse the HAR file and filter relevant information
-		List<Integer> segmentSizes = new ArrayList<>();
+		// Parse the HAR file and retrieve video fingerprint
+		List<Integer> fingerprint = new ArrayList<>();
 		HarFilter harFilter = new HarFilter(harFile);
 		try {
-			segmentSizes.addAll(harFilter.filter());
+			fingerprint.addAll(harFilter.filter());
 
 		} catch (HarReaderException e) {
 			throw new InvalidArgumentsException("An error occurred while reading HAR file: " + e.getMessage());
@@ -96,18 +96,18 @@ public class HarAddHandler implements ICmdHandler {
 		// Create video identifier
 		VideoIdentifier videoIdentifier = new VideoIdentifier(vidTitle, vidQuality, vidUrl, vidLen);
 
-		// Build fingerprints for video
+		// Build windows for video
 		try {
-			FingerprintFactory fingerprintFactory = new FingerprintFactory(segmentSizes, videoIdentifier);
-			List<Fingerprint> fingerprints = fingerprintFactory.build();
-			videoIdentifier.setAduCount(fingerprints.size());
-			videoIdentifier.setInitFingerprint(fingerprints.get(0));
+			WindowFactory windowFactory = new WindowFactory(fingerprint, videoIdentifier);
+			List<Window> windows = windowFactory.build();
+			videoIdentifier.setAduCount(windows.size());
+			videoIdentifier.setInitWindow(windows.get(0));
 
 			// Add to repository
-			FingerprintRepository.addFingerprints(fingerprints);
+			WindowRepository.addWindows(windows);
 
 			Logger.log("");
-			Logger.log("Created " + fingerprints.size() + " fingerprints for video " + vidTitle + "/" + vidLen + "/" + vidQuality);
+			Logger.log("Created " + windows.size() + " windows from " +  fingerprint.size() + " segments for video " + vidTitle + "/" + vidLen + "/" + vidQuality);
 			Logger.log("------");
 		} catch (RuntimeException e) {
 			System.out.println(e.getMessage());

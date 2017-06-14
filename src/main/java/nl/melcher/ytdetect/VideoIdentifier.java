@@ -1,7 +1,8 @@
 package nl.melcher.ytdetect;
 
 import lombok.*;
-import nl.melcher.ytdetect.fingerprinting.Fingerprint;
+import nl.melcher.ytdetect.fingerprinting.Window;
+import nl.melcher.ytdetect.fingerprinting.Window;
 
 import java.io.Serializable;
 import java.util.List;
@@ -27,7 +28,7 @@ public class VideoIdentifier implements Serializable {
 
 	@Setter @Getter private int aduCount = 0;
 
-	@Setter @Getter private Fingerprint initFingerprint = null;
+	@Setter @Getter private Window initWindow = null;
 
 	public VideoIdentifier(String title, int videoQuality, String url, int length) {
 		this.title = title;

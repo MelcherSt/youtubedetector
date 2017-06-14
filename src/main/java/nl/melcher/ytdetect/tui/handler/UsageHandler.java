@@ -12,6 +12,6 @@ public class UsageHandler implements ICmdHandler {
 		System.out.println("===============");
 		System.out.println("-a / --add	:	Parse HAR file to fingerprints - stored this session");
 		System.out.println("-r / --real	:	Parse adudump output in realtime");
-		System.out.println("-s / --save : 	Save all fingerprints created from HAR this session");
+		System.out.println("-s / --save : 	Save all windows created from HAR this session");
 	}
 }

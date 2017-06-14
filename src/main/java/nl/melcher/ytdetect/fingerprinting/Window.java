@@ -8,17 +8,17 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * Represents a section of segments of a video and as such fingerprints part of a video.
+ * Represents a section of segments of a video.
  */
-public class Fingerprint implements Serializable, Comparable {
+public class Window implements Serializable, Comparable {
 
 	/**
-	 * List of ADU sizes in bytes contained in fingerprint.
+	 * List of segment sizes in bytes contained.
 	 */
-	private List<Integer> aduBytes;
+	private List<Integer> segmentBytes;
 
 	/**
-	 * Total size in bytes of all ADUs contained in fingerprint.
+	 * Total summed size in bytes of all segments contained.
 	 */
 	@Getter	private int size = 0;
 
@@ -38,19 +38,19 @@ public class Fingerprint implements Serializable, Comparable {
 	@Getter	private VideoIdentifier videoIdentifier;
 
 	/**
-	 * Next fingerprint without any overlap on this fingerprint. May be null.
+	 * Next window without any overlap with this window. May be null.
 	 */
-	@Getter @Setter private Fingerprint next;
+	@Getter @Setter private Window next;
 
 	/**
-	 * Previous fingerprint without overlap with this fingerpints. May be null.
+	 * Previous window without overlap with this window. May be null.
 	 */
-	@Getter @Setter private Fingerprint previous;
+	@Getter @Setter private Window previous;
 
-	public Fingerprint(List<Integer> segmentSizeList, VideoIdentifier videoIdentifier, int startIndex, int endIndex) {
+	public Window(List<Integer> segmentSizeList, VideoIdentifier videoIdentifier, int startIndex, int endIndex) {
 		this.startIndex = startIndex;
 		this.endIndex = endIndex;
-		this.aduBytes = segmentSizeList;
+		this.segmentBytes = segmentSizeList;
 		this.videoIdentifier = videoIdentifier;
 		size = segmentSizeList.stream().mapToInt(Integer::intValue).sum();
 	}
@@ -64,7 +64,7 @@ public class Fingerprint implements Serializable, Comparable {
 		StringBuilder sb = new StringBuilder();
 		sb.append("Fingerprint[StartIndex=" + startIndex + ",EndIndex=" + endIndex + ",Size=" + size + ",Segments=");
 
-		for(Integer segmentSize : aduBytes) {
+		for(Integer segmentSize : segmentBytes) {
 			sb.append(segmentSize + ",");
 		}
 
@@ -74,8 +74,8 @@ public class Fingerprint implements Serializable, Comparable {
 
 	@Override
 	public int compareTo(Object o) {
-		if (o instanceof Fingerprint) {
-			int otherSize = ((Fingerprint) o).getSize();
+		if (o instanceof Window) {
+			int otherSize = ((Window) o).getSize();
 			if (otherSize < size) {
 				return -1;
 			} else if( otherSize == size) {

@@ -2,9 +2,9 @@ package nl.melcher.ytdetect.detector;
 
 import lombok.Getter;
 import nl.melcher.ytdetect.VideoIdentifier;
-import nl.melcher.ytdetect.fingerprinting.Fingerprint;
-import nl.melcher.ytdetect.fingerprinting.FingerprintFactory;
-import nl.melcher.ytdetect.fingerprinting.FingerprintRepository;
+import nl.melcher.ytdetect.fingerprinting.Window;
+import nl.melcher.ytdetect.fingerprinting.WindowFactory;
+import nl.melcher.ytdetect.fingerprinting.WindowRepository;
 import nl.melcher.ytdetect.tui.utils.Logger;
 import org.apache.commons.math3.stat.correlation.PearsonsCorrelation;
 
@@ -41,7 +41,7 @@ public class DetectorFrontEnd {
 
 	private DetectorFrontEnd() {
 		try {
-			FingerprintRepository.deserialize(FingerprintRepository.FILE_NAME);
+			WindowRepository.deserialize(WindowRepository.FILE_NAME);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -55,19 +55,19 @@ public class DetectorFrontEnd {
 		// Push size
 		aduBytes.add(segmentSize);
 
-		if(aduBytes.size() >= FingerprintFactory.WINDOW_SIZE) {
+		if(aduBytes.size() >= WindowFactory.WINDOW_SIZE) {
 			// We have at least one complete window. Calculate total size.
-			int startIndex = aduBytes.size() - (FingerprintFactory.WINDOW_SIZE - 1);
+			int startIndex = aduBytes.size() - (WindowFactory.WINDOW_SIZE - 1);
 			int endIndex = aduBytes.size();
 			int size = aduBytes.subList(startIndex, endIndex).stream().mapToInt(Integer::intValue).sum();
 
 			// Create new back end. Add it to the map and get matches.
-			DetectorBackEnd backEnd = new DetectorBackEnd(FingerprintRepository.getFingerprints());
-			List<Fingerprint> matches = backEnd.findMatches(size);
+			DetectorBackEnd backEnd = new DetectorBackEnd(WindowRepository.getWindows());
+			List<Window> matches = backEnd.findMatches(size);
 			List<VideoIdentifier> newCandidates = new ArrayList<>();
 
 			// Handle all matches
-			for(Fingerprint match : matches) {
+			for(Window match : matches) {
 				VideoIdentifier videoIdentifier = match.getVideoIdentifier();
 
 				if(newCandidates.contains(videoIdentifier)) {
@@ -132,7 +132,7 @@ public class DetectorFrontEnd {
 			}
 		}
 
-		if(aduBytes.size() < FingerprintFactory.WINDOW_SIZE) {
+		if(aduBytes.size() < WindowFactory.WINDOW_SIZE) {
 			Logger.log("No results to report.");
 		} else {
 			for(Integer aduSegment : aduBytes) {
@@ -206,7 +206,7 @@ public class DetectorFrontEnd {
 		for (Integer adu : aduBytes) {
 			curWindowBytes += adu;
 			curWindowSize +=1;
-			if (curWindowSize == FingerprintFactory.WINDOW_SIZE) {
+			if (curWindowSize == WindowFactory.WINDOW_SIZE) {
 				result.add(curWindowBytes);
 				curWindowBytes = 0;
 				curWindowSize = 0;
@@ -222,11 +222,11 @@ public class DetectorFrontEnd {
 	 */
 	private List<Integer> calcWindowsFromVid(VideoIdentifier videoIdentifier) {
 		List<Integer> result = new ArrayList<>();
-		Fingerprint fp = videoIdentifier.getInitFingerprint();
+		Window fp = videoIdentifier.getInitWindow();
 		result.add(fp.getSize());
 
 		while(fp.hasNext()) {
-			Fingerprint nextFp = fp.getNext();
+			Window nextFp = fp.getNext();
 			result.add(nextFp.getSize());
 			fp = nextFp;
 		}
