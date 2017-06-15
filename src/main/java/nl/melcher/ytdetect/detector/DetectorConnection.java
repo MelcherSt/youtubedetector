@@ -35,20 +35,19 @@ public class DetectorConnection {
 	 */
 	private Map<VideoIdentifier, Integer> candidateCountMap = new HashMap<>();
 
-	private Map<VideoIdentifier, Integer> aduSegmentOrder = new HashMap<>();
-
 	/**
-	 * List of candidates for the last incoming ADU segment.
+	 * List of all currently active detectors
 	 */
-	private List<VideoIdentifier> lastCandidates = new ArrayList<>();
-
 	private List<DetectorBackEnd> backEndList = new ArrayList<>();
 
 	public DetectorConnection(String connectionAddr) {
 		this.connectionAddr = connectionAddr;
 	}
 
-
+	/**
+	 * Push adudump input line and process.
+	 * @param line The adudump line.
+	 */
 	public void pushAdu(AduLine line) {
 		if(line.getType() == AduLine.InferredType.ADU
 				&& line.getDirection() == AduLine.Direction.INCOMING
@@ -78,7 +77,6 @@ public class DetectorConnection {
 		backEndList.add(detectorBackEnd);
 
 		List<DetectorBackEnd> backEndRemoveList = new ArrayList<>();
-
 		for(DetectorBackEnd backEnd : backEndList) {
 			List<Window> curMatches = backEnd.next(size).getCurrentState();
 
@@ -87,81 +85,35 @@ public class DetectorConnection {
 				continue;
 			}
 
+			// List of candidate videos processed in this iteration of the detector.
 			List<VideoIdentifier> curCandidates = new ArrayList<>();
 			for(Window match : curMatches) {
 				VideoIdentifier videoIdentifier = match.getVideoIdentifier();
 
+				// Do not process multiple matches for same video on single window.
 				if(curCandidates.contains(videoIdentifier)) {
-					// Do not process multiple matches for same video on single window
-					break;
+					continue;
 				}
 
 				curCandidates.add(videoIdentifier);
 
+				// Score this match. Higher generation matches are rated higher since this indicates a streak.
 				int score = 1;
-
 				if(candidateCountMap.containsKey(videoIdentifier)) {
 					score = candidateCountMap.get(videoIdentifier) +1;
 					if (backEnd.getGeneration() > 1) {
 						score += BONUS * (backEnd.getGeneration() -1);
 					}
 				}
-
 				candidateCountMap.put(videoIdentifier, score);
 			}
 		}
-
-		// Throw away detectors without any results
-		backEndRemoveList.forEach(e -> {backEndList.remove(e);});
-
-
-
-	/*	// Create new back end. Add it to the map and get matches.
-		DetectorBackEnd backEnd = new DetectorBackEnd();
-		List<Window> windowMatches = backEnd.next(size).getCurrentState();
-				//.findMatches(size);
-		List<VideoIdentifier> curCandidates = new ArrayList<>();
-
-		// Handle all matches
-		for(Window match : windowMatches) {
-			VideoIdentifier videoIdentifier = match.getVideoIdentifier();
-
-			if(curCandidates.contains(videoIdentifier)) {
-				// Do not process multiple matches for same video on single window
-				break;
-			}
-
-			curCandidates.add(videoIdentifier);
-
-			if(candidateCountMap.containsKey(videoIdentifier)) {
-				candidateCountMap.put(videoIdentifier, candidateCountMap.get(videoIdentifier) +1);
-			} else {
-				candidateCountMap.put(videoIdentifier, 1);
-			}
-
-			// TODO: deprecate. Move all to detector BE
-			if(aduSegmentOrder.containsKey(videoIdentifier)) {
-				int lastEndindex = aduSegmentOrder.get(videoIdentifier);
-				if (match.getEndIndex() <= lastEndindex) {
-					// ADU segment completely out of order.
-					candidateCountMap.put(videoIdentifier, candidateCountMap.get(videoIdentifier) - 2);
-				} else if(lastCandidates.contains(videoIdentifier) && match.getEndIndex() == lastEndindex + 1) {
-					// Exact match of expected ADU segment. Reward.
-					candidateCountMap.put(videoIdentifier, candidateCountMap.get(videoIdentifier) + BONUS);
-				}
-			}
-
-			// Update last seen index for this video
-			aduSegmentOrder.put(videoIdentifier, match.getEndIndex());
-		}
-
-		// Empty and add all candidates found in this step
-		lastCandidates.clear();
-		lastCandidates.addAll(curCandidates);*/
+		// Throw away detectors not producing any results anymore
+		backEndRemoveList.forEach(backEndList::remove);
 	}
 
 	/**
-	 * Wrap things up. Report back stats and clear all maps for a fresh start.
+	 * Write the -intermediary- results for this detector connection.
 	 */
 	public void writeResults() {
 		if(aduBytes.size() < WindowFactory.WINDOW_SIZE) {
@@ -194,14 +146,9 @@ public class DetectorConnection {
 					Logger.write(vId.getTitle());
 				}
 			}
-
 			//Logger.write("");
 			//calcCoefficient();
 		}
-
-		candidateCountMap.clear();
-		aduBytes.clear();
-		aduSegmentOrder.clear();
 	}
 
 	private void calcCoefficient() {
@@ -212,24 +159,11 @@ public class DetectorConnection {
 			vidWindowBytesMap.put(vid, getWindowsFromVideo(vid));
 		}
 
-		/* Next part is only for debugging purposes */
-		StringBuilder sb = new StringBuilder();
-		for(Integer i : windowBytes) {
-			sb.append(i + ",");
-		}
-		Logger.write(sb.toString());
-
-		/* end */
-
 		// Calculate pearson's coefficient
 		PearsonsCorrelation pearsonsCorrelation = new PearsonsCorrelation();
 
 		for(Map.Entry<VideoIdentifier, List<Integer>> entry : vidWindowBytesMap.entrySet()) {
-			sb = new StringBuilder(entry.getKey().toString() + ": ");
-			for(Integer i : entry.getValue()) {
-				sb.append(i + ",");
-			}
-			Logger.write(sb.toString());
+
 
 			List<Integer> vidWindowBytes = entry.getValue();
 			if(vidWindowBytes.size() < windowBytes.size()) {
@@ -252,7 +186,7 @@ public class DetectorConnection {
 
 	/**
 	 * Get a list of non-overlapping window sizes from the ADU input on the detector.
-	 * @return
+	 * @return List of windows.
 	 */
 	private List<Integer> getWindowsFromAduSegments() {
 		List<Integer> result = new ArrayList<>();
@@ -274,7 +208,7 @@ public class DetectorConnection {
 	/**
 	 * Get a list of non-overlapping window sizes for a video.
 	 * @param videoIdentifier
-	 * @return
+	 * @return List of windows.
 	 */
 	private List<Integer> getWindowsFromVideo(VideoIdentifier videoIdentifier) {
 		List<Integer> result = new ArrayList<>();
