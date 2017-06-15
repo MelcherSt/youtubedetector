@@ -40,7 +40,7 @@ class DetectorBackEnd {
 
 		// Perform range search and retrieve indices
 		SortedMultiset<Integer> stateSymbols = symbols.subMultiset(sizeMin.intValue(), BoundType.OPEN, sizeMax.intValue(), BoundType.OPEN);
-		Logger.debug("Frame size: " + windowSize + ", Range search: (" + sizeMin.intValue() + ", " + sizeMax.intValue() + ")");
+		Logger.debug("Gen: " + generation + ", Frame size: " + windowSize + ", Range search: (" + sizeMin.intValue() + ", " + sizeMax.intValue() + ")");
 
 		currentState.clear();
 		List<Window> expectedWindows = new ArrayList<>();
@@ -49,6 +49,11 @@ class DetectorBackEnd {
 		for(Integer symbol : stateSymbols) {
 			Logger.debug("Matched key: " + symbol);
 			currentState.addAll(symbolStateMap.get(symbol));
+			for(Window wind : symbolStateMap.get(symbol)) {
+				Logger.debug("Index: " + wind.getStartIndex());
+				Logger.debug(wind.getVideoIdentifier().getTitle());
+			}
+
 			// Find the next expected state
 			symbolStateMap.get(symbol).forEach(e -> {
 				Window nextWindow = e.getVideoIdentifier().getWindowMap().get(e.getStartIndex() + 1);

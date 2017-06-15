@@ -18,7 +18,7 @@ import java.util.*;
  */
 public class DetectorConnection {
 
-	private static final int BONUS = 4;
+	private static final int BONUS = 2;
 
 	/**
 	 * List of incoming ADU sizes in bytes including any HTTP and/or TLS overhead still.
@@ -42,7 +42,7 @@ public class DetectorConnection {
 	 */
 	private List<VideoIdentifier> lastCandidates = new ArrayList<>();
 
-	private List<DetectorBackEnd> backEnds = new ArrayList<>();
+	private List<DetectorBackEnd> backEndList = new ArrayList<>();
 
 	public DetectorConnection(String connectionAddr) {
 		this.connectionAddr = connectionAddr;
@@ -73,7 +73,50 @@ public class DetectorConnection {
 	 * @param size The window size in bytes.
 	 */
 	private void processWindow(int size) {
-		// Create new back end. Add it to the map and get matches.
+		// Create new detector in initial state
+		DetectorBackEnd detectorBackEnd = new DetectorBackEnd();
+		backEndList.add(detectorBackEnd);
+
+		List<DetectorBackEnd> backEndRemoveList = new ArrayList<>();
+
+		for(DetectorBackEnd backEnd : backEndList) {
+			List<Window> curMatches = backEnd.next(size).getCurrentState();
+
+			if(curMatches.size() == 0) {
+				backEndRemoveList.add(backEnd);
+				continue;
+			}
+
+			List<VideoIdentifier> curCandidates = new ArrayList<>();
+			for(Window match : curMatches) {
+				VideoIdentifier videoIdentifier = match.getVideoIdentifier();
+
+				if(curCandidates.contains(videoIdentifier)) {
+					// Do not process multiple matches for same video on single window
+					break;
+				}
+
+				curCandidates.add(videoIdentifier);
+
+				int score = 1;
+
+				if(candidateCountMap.containsKey(videoIdentifier)) {
+					score = candidateCountMap.get(videoIdentifier) +1;
+					if (backEnd.getGeneration() > 1) {
+						score += BONUS * (backEnd.getGeneration() -1);
+					}
+				}
+
+				candidateCountMap.put(videoIdentifier, score);
+			}
+		}
+
+		// Throw away detectors without any results
+		backEndRemoveList.forEach(e -> {backEndList.remove(e);});
+
+
+
+	/*	// Create new back end. Add it to the map and get matches.
 		DetectorBackEnd backEnd = new DetectorBackEnd();
 		List<Window> windowMatches = backEnd.next(size).getCurrentState();
 				//.findMatches(size);
@@ -114,7 +157,7 @@ public class DetectorConnection {
 
 		// Empty and add all candidates found in this step
 		lastCandidates.clear();
-		lastCandidates.addAll(curCandidates);
+		lastCandidates.addAll(curCandidates);*/
 	}
 
 	/**
@@ -126,6 +169,7 @@ public class DetectorConnection {
 		} else {
 			Logger.write("Results for " + connectionAddr);
 
+			// Remove any candidates ending up with 0 occurrences
 			List<VideoIdentifier> toBeRemoved = new ArrayList<>();
 			candidateCountMap.entrySet().forEach(e -> { if( e.getValue() < 0) { toBeRemoved.add(e.getKey());}});
 			toBeRemoved.forEach(candidateCountMap::remove);
@@ -151,9 +195,8 @@ public class DetectorConnection {
 				}
 			}
 
-			Logger.write("");
-			calcCoefficient();
-
+			//Logger.write("");
+			//calcCoefficient();
 		}
 
 		candidateCountMap.clear();
