@@ -101,7 +101,6 @@ public class HarAddHandler implements ICmdHandler {
 			WindowFactory windowFactory = new WindowFactory(fingerprint, videoIdentifier);
 			List<Window> windows = windowFactory.build();
 			videoIdentifier.setAduCount(windows.size());
-			videoIdentifier.setInitWindow(windows.get(0));
 
 			// Add to repository
 			WindowRepository.getInstance().addWindows(windows);

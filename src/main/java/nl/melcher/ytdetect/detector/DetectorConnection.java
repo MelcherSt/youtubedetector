@@ -230,13 +230,10 @@ public class DetectorConnection {
 	 */
 	private List<Integer> getWindowsFromVideo(VideoIdentifier videoIdentifier) {
 		List<Integer> result = new ArrayList<>();
-		Window window = videoIdentifier.getWindowMap().get(0);
-		result.add(window.getSize());
-
-		while(window.hasNext()) {
-			Window nextFp = window.getNext();
-			result.add(nextFp.getSize());
-			window = nextFp;
+		int startIndex = 0;
+		while(videoIdentifier.getWindowMap().containsKey(startIndex)) {
+			result.add(videoIdentifier.getWindowMap().get(startIndex).getSize());
+			startIndex += WindowFactory.WINDOW_SIZE;
 		}
 		return result;
 	}

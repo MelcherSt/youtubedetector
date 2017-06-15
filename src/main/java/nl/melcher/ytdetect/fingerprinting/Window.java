@@ -13,7 +13,7 @@ import java.util.List;
 public class Window implements Serializable, Comparable {
 
 	/**
-	 * List of segment sizes in bytes contained.
+	 * List of segment sizes in bytes.
 	 */
 	private List<Integer> segmentBytes;
 
@@ -37,21 +37,12 @@ public class Window implements Serializable, Comparable {
 	 */
 	@Getter	private VideoIdentifier videoIdentifier;
 
-	/**
-	 * Next window without any overlap with this window. May be null.
-	 */
-	@Getter @Setter private Window next;
-
 	public Window(List<Integer> segmentSizeList, VideoIdentifier videoIdentifier, int startIndex, int endIndex) {
 		this.startIndex = startIndex;
 		this.endIndex = endIndex;
 		this.segmentBytes = segmentSizeList;
 		this.videoIdentifier = videoIdentifier;
 		size = segmentSizeList.stream().mapToInt(Integer::intValue).sum();
-	}
-
-	public boolean hasNext() {
-		return next != null;
 	}
 
 	@Override
@@ -62,8 +53,6 @@ public class Window implements Serializable, Comparable {
 		for(Integer segmentSize : segmentBytes) {
 			sb.append(segmentSize + ",");
 		}
-
-		sb.append(",NextIndex=" + ((next != null) ? next.getStartIndex() : "null") + "]");
 		return sb.toString();
 	}
 

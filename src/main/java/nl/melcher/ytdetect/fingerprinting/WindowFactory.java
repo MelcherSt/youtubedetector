@@ -14,13 +14,14 @@ import java.util.Map;
 @AllArgsConstructor
 public class WindowFactory {
 
-	private List<Integer> segmentBytes;
-	private VideoIdentifier videoIdentifier;
-
 	/**
 	 * Size of sliding window frames.
 	 */
 	public static final int WINDOW_SIZE = 7;
+
+
+	private List<Integer> segmentBytes;
+	private VideoIdentifier videoIdentifier;
 
 	public List<Window> build() {
 		if (segmentBytes.size() < WINDOW_SIZE) {
@@ -28,31 +29,19 @@ public class WindowFactory {
 					+ segmentBytes.size() + " Expected: " + WINDOW_SIZE);
 		}
 
-		List<Window> windowsList = new ArrayList<>();
-		int lastIndex = WINDOW_SIZE -1;
+		List<Window> result = new ArrayList<>();
 		int firstIndex = 0;
+		int lastIndex = WINDOW_SIZE -1;
 
-		// Create a mapping for assigning 'next' windows
-		Map<Integer, Window> nextMap = new HashMap<>();
-
+		// Slide the window along the array of segment sizes
 		while(lastIndex < (segmentBytes.size() + 1)) {
 			List<Integer> sublist = new ArrayList(segmentBytes.subList(firstIndex, lastIndex));
 			Window window = new Window(sublist, videoIdentifier, firstIndex, lastIndex);
-			windowsList.add(window);
-
+			result.add(window);
 			videoIdentifier.getWindowMap().put(firstIndex, window);
-
-			// Assign this window as next to earlier ones
-			if(nextMap.containsKey(firstIndex)) {
-				nextMap.get(firstIndex).setNext(window);
-			}
-
-			// Add window to receive its next
-			nextMap.put(lastIndex, window);
-
 			firstIndex += 1;
 			lastIndex += 1;
 		}
-		return windowsList;
+		return result;
 	}
 }
