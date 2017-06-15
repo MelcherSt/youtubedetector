@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.*;
 
 /**
- * Detector front end singleton. Handles incoming ADUs and controls instances of {@link DetectorBackEnd}.
+ * Detector front end for a connection. Handles incoming ADUs and controls instances of {@link DetectorBackEnd}.
  * The front end oversees all incoming match information from back ends and constructs a list of video candidateCountMap
  * based on this information.
  */
@@ -37,16 +37,6 @@ public class DetectorFrontEnd {
 	 */
 	private List<VideoIdentifier> lastCandidates = new ArrayList<>();
 
-	@Getter	public static DetectorFrontEnd instance = new DetectorFrontEnd();
-
-	private DetectorFrontEnd() {
-		try {
-			WindowRepository.deserialize(WindowRepository.FILE_NAME);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
 	/**
 	 * Push an incoming segment size for detection.
 	 * @param segmentSize The size of a segment.
@@ -62,7 +52,7 @@ public class DetectorFrontEnd {
 			int size = aduBytes.subList(startIndex, endIndex).stream().mapToInt(Integer::intValue).sum();
 
 			// Create new back end. Add it to the map and get matches.
-			DetectorBackEnd backEnd = new DetectorBackEnd(WindowRepository.getWindows());
+			DetectorBackEnd backEnd = new DetectorBackEnd(WindowRepository.getInstance().getWindows());
 			List<Window> matches = backEnd.findMatches(size);
 			List<VideoIdentifier> newCandidates = new ArrayList<>();
 
@@ -108,8 +98,8 @@ public class DetectorFrontEnd {
 	 */
 	public void wrap() {
 		List<VideoIdentifier> toBeRemoved = new ArrayList<>();
-		candidateCountMap.entrySet().stream().forEach(e -> { if( e.getValue() < 0) { toBeRemoved.add(e.getKey());}});
-		toBeRemoved.stream().forEach(e -> { candidateCountMap.remove(e);});
+		candidateCountMap.entrySet().forEach(e -> { if( e.getValue() < 0) { toBeRemoved.add(e.getKey());}});
+		toBeRemoved.forEach(candidateCountMap::remove);
 
 		int total = candidateCountMap.values().stream().mapToInt(Integer::intValue).sum();
 		Map<Integer, Set<VideoIdentifier>> countMap = new HashMap<>();

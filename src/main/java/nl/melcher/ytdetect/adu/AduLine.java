@@ -2,12 +2,13 @@ package nl.melcher.ytdetect.adu;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import nl.melcher.ytdetect.tui.utils.Logger;
 
 /**
  * Partly representation of a single line of `adudump` output.
  */
 @AllArgsConstructor
-public class AduDumpLine {
+public class AduLine {
 
 	@Getter private InferredType type;
 	@Getter private String timestamp;
@@ -16,6 +17,10 @@ public class AduDumpLine {
 	@Getter private int size = 0;
 	@Getter private Direction direction;
 
+	/**
+	 * Get the address from which data was sent.
+	 * @return
+	 */
 	public String getFromAddress() {
 		if(direction == Direction.INCOMING) {
 			return addrTwo;
@@ -25,6 +30,10 @@ public class AduDumpLine {
 		return "";
 	}
 
+	/**
+	 * Get the address to which data was sent.
+	 * @return
+	 */
 	public String getToAddress() {
 		if(direction == Direction.INCOMING) {
 			return addrOne;
@@ -32,6 +41,25 @@ public class AduDumpLine {
 			return addrTwo;
 		}
 		return "";
+	}
+
+	@Override
+	public String toString() {
+		return "AduLine[Type=" + type + ",Timestamp=" + timestamp + ",AddrOne="
+				+ addrOne + ",AddrTwo=" + addrTwo + ",Direction=" + direction + ",Size=" + size + "]";
+	}
+
+	/**
+	 * Determine if the given address contains port 443.
+	 * @param addr
+	 * @return
+	 */
+	public static boolean isTLS(String addr) {
+		String[] segm = addr.split("\\.");
+		if (segm.length == 0) {
+			return false;
+		}
+		return (segm[segm.length -1]).equals("443");
 	}
 
 	public enum InferredType {
@@ -51,11 +79,5 @@ public class AduDumpLine {
 					return Direction.UNKNOWN;
 			}
 		}
-	}
-
-	@Override
-	public String toString() {
-		return "AduDumpLine[Type=" + type + ",Timestamp=" + timestamp + ",AddrOne="
-				+ addrOne + ",AddrTwo=" + addrTwo + ",Direction=" + direction + ",Size=" + size + "]";
 	}
 }

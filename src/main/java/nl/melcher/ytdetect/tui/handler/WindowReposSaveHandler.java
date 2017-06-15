@@ -24,7 +24,7 @@ public class WindowReposSaveHandler implements ICmdHandler {
 		}
 
 		try {
-			WindowRepository.serialize(fileName);
+			WindowRepository.getInstance().serialize(fileName);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

@@ -11,9 +11,9 @@ import java.util.List;
 /**
  * Provides core segment matching facilities. Does the heavy lifting (range searching etc.).
  */
-public class DetectorBackEnd {
+class DetectorBackEnd {
 
-	private static final double TLS_MIN = 1.0019;
+	private static final double TLS_MIN = 1.0023;
 	private static final double TLS_MAX = 1.0017;
 	private static final int HTTP_HEADER = 525;
 

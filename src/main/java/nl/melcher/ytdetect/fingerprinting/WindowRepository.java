@@ -1,5 +1,9 @@
 package nl.melcher.ytdetect.fingerprinting;
 
+import lombok.Getter;
+import nl.melcher.ytdetect.tui.utils.Logger;
+import sun.rmi.runtime.Log;
+
 import java.io.*;
 import java.util.*;
 
@@ -9,14 +13,24 @@ import java.util.*;
 public class WindowRepository {
 
 	private static final List<Window> WINDOWS = new ArrayList<>();
-	public static final String FILE_NAME = "fingerprints.bin";
+	public static final String FILE_NAME = "ytdetectrepos.bin";
 
-	public static void addWindow(Window window) {
+	public void addWindow(Window window) {
 		WINDOWS.add(window);
 	}
 
-	public static void addWindows(Collection<Window> windows) {
+	public void addWindows(Collection<Window> windows) {
 		WINDOWS.addAll(windows);
+	}
+
+	@Getter	public static WindowRepository instance = new WindowRepository();
+
+	private WindowRepository() {
+		try {
+			deserialize(WindowRepository.FILE_NAME);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	 /* Clear current windows and add all deserialized windows from file.
@@ -24,12 +38,14 @@ public class WindowRepository {
 	 * @throws IOException
 	 * @throws ClassNotFoundException
 	 */
-	public static void deserialize(String fileName) throws IOException {
+	public void deserialize(String fileName) throws IOException {
 		try(ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(fileName))) {
 			WINDOWS.clear();
 			WINDOWS.addAll((List<Window>)inputStream.readObject());
-		} catch(ClassNotFoundException ex) {
-			// Ignore
+		} catch(ClassNotFoundException | InvalidClassException ex) {
+			Logger.log("Could not deserialize windows from file '" + fileName + "'");
+		} catch(FileNotFoundException ex) {
+			Logger.log("File '" + fileName + "' was not found. Please create this file first using the '-a' and '-s' switches.");
 		}
 	}
 
@@ -38,7 +54,7 @@ public class WindowRepository {
 	 * @param fileName
 	 * @throws IOException
 	 */
-	public static void serialize(String fileName) throws IOException {
+	public void serialize(String fileName) throws IOException {
 		try (ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(fileName))) {
 			outputStream.writeObject(WINDOWS);
 		}
@@ -48,7 +64,7 @@ public class WindowRepository {
 	 * Get a list of the currently loaded windows.
 	 * @return The list of windows.
 	 */
-	public static List<Window> getWindows() {
+	public List<Window> getWindows() {
 		return WINDOWS;
 	}
 }

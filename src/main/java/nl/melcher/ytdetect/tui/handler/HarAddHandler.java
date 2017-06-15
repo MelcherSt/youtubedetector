@@ -104,7 +104,7 @@ public class HarAddHandler implements ICmdHandler {
 			videoIdentifier.setInitWindow(windows.get(0));
 
 			// Add to repository
-			WindowRepository.addWindows(windows);
+			WindowRepository.getInstance().addWindows(windows);
 
 			Logger.log("");
 			Logger.log("Created " + windows.size() + " windows from " +  fingerprint.size() + " segments for video " + vidTitle + "/" + vidLen + "/" + vidQuality);

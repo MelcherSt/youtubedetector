@@ -18,7 +18,7 @@ public class AduDumpParser {
 	 * @return
 	 * @throws IOException
 	 */
-	public static List<AduDumpLine> parseFile(String fileName) throws IOException {
+	public static List<AduLine> parseFile(String fileName) throws IOException {
 		try (Stream<String> stream = Files.lines(Paths.get(fileName))) {
 			return stream.map(AduDumpParser::parseLine).collect(Collectors.toList());
 		}
@@ -29,32 +29,32 @@ public class AduDumpParser {
 	 * @param aduDumpLine
 	 * @return
 	 */
-	public static AduDumpLine parseLine(String aduDumpLine) throws MalformedAduLineException {
+	public static AduLine parseLine(String aduDumpLine) throws MalformedAduLineException {
 		String[] parts = aduDumpLine.split(" ");
 		if (parts.length < 5) {
 			throw new MalformedAduLineException("A line should contain at least 5 parts of information.");
 		}
 
 		// Get all the data
-		AduDumpLine.InferredType type;
+		AduLine.InferredType type;
 		String timestamp = parts[1];
 		String addrOne = parts[2];
-		AduDumpLine.Direction direction = AduDumpLine.Direction.fromString(parts[3]);
+		AduLine.Direction direction = AduLine.Direction.fromString(parts[3]);
 		String addrTwo = parts[4];
 		int size = 0;
 
 		// Get type
 		try {
-			type = AduDumpLine.InferredType.valueOf(parts[0].substring(0, 3));
+			type = AduLine.InferredType.valueOf(parts[0].substring(0, 3));
 		} catch (IllegalArgumentException ex) {
-			type = AduDumpLine.InferredType.UNKNOWN;
+			type = AduLine.InferredType.UNKNOWN;
 		}
 
 		// Set size when necessary
-		if(type == AduDumpLine.InferredType.ADU) {
+		if(type == AduLine.InferredType.ADU) {
 			size = Integer.valueOf(parts[5]);
 		}
 
-		return new AduDumpLine(type, timestamp, addrOne, addrTwo, size, direction);
+		return new AduLine(type, timestamp, addrOne, addrTwo, size, direction);
 	}
 }
