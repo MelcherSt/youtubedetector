@@ -42,11 +42,6 @@ public class Window implements Serializable, Comparable {
 	 */
 	@Getter @Setter private Window next;
 
-	/**
-	 * Previous window without overlap with this window. May be null.
-	 */
-	@Getter @Setter private Window previous;
-
 	public Window(List<Integer> segmentSizeList, VideoIdentifier videoIdentifier, int startIndex, int endIndex) {
 		this.startIndex = startIndex;
 		this.endIndex = endIndex;

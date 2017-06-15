@@ -1,22 +1,22 @@
 package nl.melcher.ytdetect.detector;
 
-import lombok.Getter;
 import nl.melcher.ytdetect.VideoIdentifier;
+import nl.melcher.ytdetect.adu.AduLine;
 import nl.melcher.ytdetect.fingerprinting.Window;
 import nl.melcher.ytdetect.fingerprinting.WindowFactory;
 import nl.melcher.ytdetect.fingerprinting.WindowRepository;
+import nl.melcher.ytdetect.har.HarFilter;
 import nl.melcher.ytdetect.tui.utils.Logger;
 import org.apache.commons.math3.stat.correlation.PearsonsCorrelation;
 
-import java.io.IOException;
 import java.util.*;
 
 /**
- * Detector front end for a connection. Handles incoming ADUs and controls instances of {@link DetectorBackEnd}.
- * The front end oversees all incoming match information from back ends and constructs a list of video candidateCountMap
- * based on this information.
+ * Represents a connection. Handles incoming ADUs and controls instances of {@link DetectorBackEnd}.
+ * The {@link DetectorConnection} oversees all reported window matches from back ends and constructs
+ * a list of candidates based on this information.
  */
-public class DetectorFrontEnd {
+public class DetectorConnection {
 
 	private static final int BONUS = 4;
 
@@ -26,22 +26,44 @@ public class DetectorFrontEnd {
 	private List<Integer> aduBytes = new ArrayList<>();
 
 	/**
-	 * Mapping of found candidate videos to their # of occurrence.
+	 * Mapping candidate videos to their occurrence.
 	 */
 	private Map<VideoIdentifier, Integer> candidateCountMap = new HashMap<>();
 
 	private Map<VideoIdentifier, Integer> aduSegmentOrder = new HashMap<>();
 
 	/**
-	 * List containing all candidates that were found in the last segment push.
+	 * List of candidates for the last incoming ADU segment.
 	 */
 	private List<VideoIdentifier> lastCandidates = new ArrayList<>();
+
+	/**
+	 * Identifier for the connection this detector works on.
+	 */
+	private String connectionAddr;
+
+	public DetectorConnection(String connectionAddr) {
+		this.connectionAddr = connectionAddr;
+	}
+
+
+	public void pushAdu(AduLine line) {
+		if(line.getType() == AduLine.InferredType.ADU
+				&& line.getDirection() == AduLine.Direction.INCOMING
+				&& line.getSize() > HarFilter.SEGMENT_SIZE_THRESHOLD) {
+			// Process ADU segment
+			pushAduSegment(line.getSize());
+		} else if(line.getType() == AduLine.InferredType.END) {
+			// Connection ends here. Close down detector.
+			writeResults();
+		}
+	}
 
 	/**
 	 * Push an incoming segment size for detection.
 	 * @param segmentSize The size of a segment.
 	 */
-	public void pushAduSegment(Integer segmentSize) {
+	private void pushAduSegment(Integer segmentSize) {
 		// Push size
 		aduBytes.add(segmentSize);
 
@@ -96,7 +118,7 @@ public class DetectorFrontEnd {
 	/**
 	 * Wrap things up. Report back stats and clear all maps for a fresh start.
 	 */
-	public void wrap() {
+	public void writeResults() {
 		List<VideoIdentifier> toBeRemoved = new ArrayList<>();
 		candidateCountMap.entrySet().forEach(e -> { if( e.getValue() < 0) { toBeRemoved.add(e.getKey());}});
 		toBeRemoved.forEach(candidateCountMap::remove);
@@ -123,16 +145,12 @@ public class DetectorFrontEnd {
 		}
 
 		if(aduBytes.size() < WindowFactory.WINDOW_SIZE) {
-			Logger.log("No results to report.");
+			Logger.log("No results to report for " + connectionAddr);
 		} else {
-			for(Integer aduSegment : aduBytes) {
-				System.out.print(aduSegment + ", ");
-			}
+			calcCoefficient();
+
 		}
 
-		calcCoefficient();
-
-		// Clear everything
 		candidateCountMap.clear();
 		aduBytes.clear();
 		aduSegmentOrder.clear();
@@ -140,10 +158,10 @@ public class DetectorFrontEnd {
 
 	private void calcCoefficient() {
 		// Prepare
-		List<Integer> windowBytes = calcWindowsFromInput();
+		List<Integer> windowBytes = getWindowsFromAduSegments();
 		Map<VideoIdentifier, List<Integer>> vidWindowBytesMap = new HashMap<>();
 		for (VideoIdentifier vid : candidateCountMap.keySet()) {
-			vidWindowBytesMap.put(vid, calcWindowsFromVid(vid));
+			vidWindowBytesMap.put(vid, getWindowsFromVideo(vid));
 		}
 
 		/* Next part is only for debugging purposes */
@@ -155,7 +173,7 @@ public class DetectorFrontEnd {
 
 		/* end */
 
-		// Calculate pearson's value
+		// Calculate pearson's coefficient
 		PearsonsCorrelation pearsonsCorrelation = new PearsonsCorrelation();
 
 		for(Map.Entry<VideoIdentifier, List<Integer>> entry : vidWindowBytesMap.entrySet()) {
@@ -188,7 +206,7 @@ public class DetectorFrontEnd {
 	 * Get a list of non-overlapping window sizes from the ADU input on the detector.
 	 * @return
 	 */
-	private List<Integer> calcWindowsFromInput() {
+	private List<Integer> getWindowsFromAduSegments() {
 		List<Integer> result = new ArrayList<>();
 		int curWindowBytes = 0;
 		int curWindowSize = 0;
@@ -206,19 +224,19 @@ public class DetectorFrontEnd {
 	}
 
 	/**
-	 * Get a list of non-overlapping windows sizes for a video.
+	 * Get a list of non-overlapping window sizes for a video.
 	 * @param videoIdentifier
 	 * @return
 	 */
-	private List<Integer> calcWindowsFromVid(VideoIdentifier videoIdentifier) {
+	private List<Integer> getWindowsFromVideo(VideoIdentifier videoIdentifier) {
 		List<Integer> result = new ArrayList<>();
-		Window fp = videoIdentifier.getInitWindow();
-		result.add(fp.getSize());
+		Window window = videoIdentifier.getWindowMap().get(0);
+		result.add(window.getSize());
 
-		while(fp.hasNext()) {
-			Window nextFp = fp.getNext();
+		while(window.hasNext()) {
+			Window nextFp = window.getNext();
 			result.add(nextFp.getSize());
-			fp = nextFp;
+			window = nextFp;
 		}
 		return result;
 	}

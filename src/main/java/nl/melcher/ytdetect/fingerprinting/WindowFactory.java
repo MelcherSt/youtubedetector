@@ -28,7 +28,7 @@ public class WindowFactory {
 					+ segmentBytes.size() + " Expected: " + WINDOW_SIZE);
 		}
 
-		List<Window> windows = new ArrayList<>();
+		List<Window> windowsList = new ArrayList<>();
 		int lastIndex = WINDOW_SIZE -1;
 		int firstIndex = 0;
 
@@ -37,24 +37,22 @@ public class WindowFactory {
 
 		while(lastIndex < (segmentBytes.size() + 1)) {
 			List<Integer> sublist = new ArrayList(segmentBytes.subList(firstIndex, lastIndex));
-			Window fp = new Window(sublist, videoIdentifier, firstIndex, lastIndex);
-			windows.add(fp);
+			Window window = new Window(sublist, videoIdentifier, firstIndex, lastIndex);
+			windowsList.add(window);
+
+			videoIdentifier.getWindowMap().put(firstIndex, window);
 
 			// Assign this window as next to earlier ones
 			if(nextMap.containsKey(firstIndex)) {
-				nextMap.get(firstIndex).setNext(fp);
-			}
-
-			if(nextMap.containsKey(firstIndex - 1 - WINDOW_SIZE)) {
-				fp.setPrevious(nextMap.get(firstIndex - 1 - WINDOW_SIZE));
+				nextMap.get(firstIndex).setNext(window);
 			}
 
 			// Add window to receive its next
-			nextMap.put(lastIndex, fp);
+			nextMap.put(lastIndex, window);
 
 			firstIndex += 1;
 			lastIndex += 1;
 		}
-		return windows;
+		return windowsList;
 	}
 }

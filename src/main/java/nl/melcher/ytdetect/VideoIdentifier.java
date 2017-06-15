@@ -5,7 +5,9 @@ import nl.melcher.ytdetect.fingerprinting.Window;
 import nl.melcher.ytdetect.fingerprinting.Window;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Identifies a YouTube video
@@ -28,7 +30,10 @@ public class VideoIdentifier implements Serializable {
 
 	@Setter @Getter private int aduCount = 0;
 
-	@Setter @Getter private Window initWindow = null;
+	/**
+	 * Map start index to a window
+	 */
+	@Getter public final Map<Integer, Window> windowMap = new HashMap<>();
 
 	public VideoIdentifier(String title, int videoQuality, String url, int length) {
 		this.title = title;
