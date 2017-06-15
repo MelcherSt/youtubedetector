@@ -52,7 +52,14 @@ public class DetectorConnection {
 				&& line.getDirection() == AduLine.Direction.INCOMING
 				&& line.getSize() > HarFilter.SEGMENT_SIZE_THRESHOLD) {
 			// Process ADU segment
-			pushAduSegment(line.getSize());
+			aduBytes.add(line.getSize());
+			if(aduBytes.size() >= WindowFactory.WINDOW_SIZE) {
+				// We have at least one complete window. Calculate total size.
+				int startIndex = aduBytes.size() - (WindowFactory.WINDOW_SIZE - 1);
+				int endIndex = aduBytes.size();
+				int size = aduBytes.subList(startIndex, endIndex).stream().mapToInt(Integer::intValue).sum();
+				processWindow(size);
+			}
 		} else if(line.getType() == AduLine.InferredType.END) {
 			// Connection ends here. Close down detector.
 			writeResults();
@@ -60,59 +67,51 @@ public class DetectorConnection {
 	}
 
 	/**
-	 * Push an incoming segment size for detection.
-	 * @param segmentSize The size of a segment.
+	 * Process a single window of given size.
+	 * @param size The window size in bytes.
 	 */
-	private void pushAduSegment(Integer segmentSize) {
-		// Push size
-		aduBytes.add(segmentSize);
+	private void processWindow(int size) {
+		// Create new back end. Add it to the map and get matches.
+		DetectorBackEnd backEnd = new DetectorBackEnd(WindowRepository.getInstance().getWindows());
+		List<Window> windowMatches = backEnd.findMatches(size);
+		List<VideoIdentifier> curCandidates = new ArrayList<>();
 
-		if(aduBytes.size() >= WindowFactory.WINDOW_SIZE) {
-			// We have at least one complete window. Calculate total size.
-			int startIndex = aduBytes.size() - (WindowFactory.WINDOW_SIZE - 1);
-			int endIndex = aduBytes.size();
-			int size = aduBytes.subList(startIndex, endIndex).stream().mapToInt(Integer::intValue).sum();
+		// Handle all matches
+		for(Window match : windowMatches) {
+			VideoIdentifier videoIdentifier = match.getVideoIdentifier();
 
-			// Create new back end. Add it to the map and get matches.
-			DetectorBackEnd backEnd = new DetectorBackEnd(WindowRepository.getInstance().getWindows());
-			List<Window> matches = backEnd.findMatches(size);
-			List<VideoIdentifier> newCandidates = new ArrayList<>();
-
-			// Handle all matches
-			for(Window match : matches) {
-				VideoIdentifier videoIdentifier = match.getVideoIdentifier();
-
-				if(newCandidates.contains(videoIdentifier)) {
-					// Do not process multiple matches for same video on single window
-					break;
-				}
-				newCandidates.add(videoIdentifier);
-
-				if(candidateCountMap.containsKey(videoIdentifier)) {
-					candidateCountMap.put(videoIdentifier, candidateCountMap.get(videoIdentifier) +1);
-				} else {
-					candidateCountMap.put(videoIdentifier, 1);
-				}
-
-				if(aduSegmentOrder.containsKey(videoIdentifier)) {
-					int lastEndindex = aduSegmentOrder.get(videoIdentifier);
-					if (match.getEndIndex() <= lastEndindex) {
-						// ADU segment completely out of order.
-						candidateCountMap.put(videoIdentifier, candidateCountMap.get(videoIdentifier) - 2);
-					} else if(lastCandidates.contains(videoIdentifier) && match.getEndIndex() == lastEndindex + 1) {
-						// Exact match of expected ADU segment. Reward.
-						candidateCountMap.put(videoIdentifier, candidateCountMap.get(videoIdentifier) + BONUS);
-					}
-				}
-
-				// Update last seen index for this video
-				aduSegmentOrder.put(videoIdentifier, match.getEndIndex());
+			if(curCandidates.contains(videoIdentifier)) {
+				// Do not process multiple matches for same video on single window
+				break;
 			}
 
-			// Empty and add all candidates found in this step
-			lastCandidates.clear();
-			lastCandidates.addAll(newCandidates);
+			curCandidates.add(videoIdentifier);
+
+			if(candidateCountMap.containsKey(videoIdentifier)) {
+				candidateCountMap.put(videoIdentifier, candidateCountMap.get(videoIdentifier) +1);
+			} else {
+				candidateCountMap.put(videoIdentifier, 1);
+			}
+
+			// TODO: deprecate. Move all to detector BE
+			if(aduSegmentOrder.containsKey(videoIdentifier)) {
+				int lastEndindex = aduSegmentOrder.get(videoIdentifier);
+				if (match.getEndIndex() <= lastEndindex) {
+					// ADU segment completely out of order.
+					candidateCountMap.put(videoIdentifier, candidateCountMap.get(videoIdentifier) - 2);
+				} else if(lastCandidates.contains(videoIdentifier) && match.getEndIndex() == lastEndindex + 1) {
+					// Exact match of expected ADU segment. Reward.
+					candidateCountMap.put(videoIdentifier, candidateCountMap.get(videoIdentifier) + BONUS);
+				}
+			}
+
+			// Update last seen index for this video
+			aduSegmentOrder.put(videoIdentifier, match.getEndIndex());
 		}
+
+		// Empty and add all candidates found in this step
+		lastCandidates.clear();
+		lastCandidates.addAll(curCandidates);
 	}
 
 	/**
