@@ -5,6 +5,7 @@ import nl.melcher.ytdetect.adu.AduDumpParser;
 import nl.melcher.ytdetect.adu.MalformedAduLineException;
 import nl.melcher.ytdetect.detector.DetectorConnection;
 import nl.melcher.ytdetect.tui.InvalidArgumentsException;
+import nl.melcher.ytdetect.tui.utils.Logger;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -15,12 +16,11 @@ import java.util.Map;
 
 /**
  * Parses incoming adudump lines and delegates ADU segments to detectors.
- * (when piped to adudump like so: "sudo ./adudump -l 192.168.1./16 if:enps0 | java -jar ytdetector.jar -r")
  */
-public class RealTimeHandler implements IHandler {
+public class AduDumpInputHandler implements IHandler {
 	@Override
 	public void handle(List<String> args) throws InvalidArgumentsException {
-		System.out.println("Real-time mode. Awaiting input...");
+		Logger.write("Awaiting input...");
 
 		// Create input source
 		BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
@@ -48,9 +48,9 @@ public class RealTimeHandler implements IHandler {
 				}
 
 			} catch (IOException e) {
-				System.out.println("Expected input, but none was given.");
+				Logger.write("Expected input, but none was given.");
 			} catch (MalformedAduLineException ex) {
-				// No more incoming valid ADU lines.
+				// No more incoming valid ADU lines. Close down all connections.
 				for(DetectorConnection detectorConnection : connectionMap.values()) {
 					detectorConnection.writeResults();
 					connectionMap.remove(detectorConnection);

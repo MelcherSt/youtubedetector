@@ -4,7 +4,6 @@ import nl.melcher.ytdetect.VideoIdentifier;
 import nl.melcher.ytdetect.adu.AduLine;
 import nl.melcher.ytdetect.fingerprinting.Window;
 import nl.melcher.ytdetect.fingerprinting.WindowFactory;
-import nl.melcher.ytdetect.fingerprinting.WindowRepository;
 import nl.melcher.ytdetect.har.HarFilter;
 import nl.melcher.ytdetect.tui.utils.Logger;
 import org.apache.commons.math3.stat.correlation.PearsonsCorrelation;
@@ -12,7 +11,7 @@ import org.apache.commons.math3.stat.correlation.PearsonsCorrelation;
 import java.util.*;
 
 /**
- * Represents a connection. Handles incoming ADUs and controls instances of {@link DetectorBackEnd}.
+ * Represents a connection. Handles incoming ADUs and controls instances of {@link Detector}.
  * The {@link DetectorConnection} oversees all reported window matches from back ends and constructs
  * a list of candidates based on this information.
  */
@@ -38,7 +37,7 @@ public class DetectorConnection {
 	/**
 	 * List of all currently active detectors
 	 */
-	private List<DetectorBackEnd> backEndList = new ArrayList<>();
+	private List<Detector> backEndList = new ArrayList<>();
 
 	public DetectorConnection(String connectionAddr) {
 		this.connectionAddr = connectionAddr;
@@ -73,11 +72,11 @@ public class DetectorConnection {
 	 */
 	private void processWindow(int size) {
 		// Create new detector in initial state
-		DetectorBackEnd detectorBackEnd = new DetectorBackEnd();
+		Detector detectorBackEnd = new Detector();
 		backEndList.add(detectorBackEnd);
 
-		List<DetectorBackEnd> backEndRemoveList = new ArrayList<>();
-		for(DetectorBackEnd backEnd : backEndList) {
+		List<Detector> backEndRemoveList = new ArrayList<>();
+		for(Detector backEnd : backEndList) {
 			List<Window> curMatches = backEnd.next(size).getCurrentState();
 
 			if(curMatches.size() == 0) {

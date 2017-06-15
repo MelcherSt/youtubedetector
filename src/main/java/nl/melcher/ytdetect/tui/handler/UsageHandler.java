@@ -11,7 +11,7 @@ public class UsageHandler implements IHandler {
 		System.out.println("Usage details");
 		System.out.println("===============");
 		System.out.println("-a / --add	:	Parse HAR file to windows - stored this session");
-		System.out.println("-r / --real	:	Parse adudump output in realtime");
+		System.out.println("-r / --real	:	Parse adudump output");
 		System.out.println("-s / --save : 	Save all windows parsed from HAR this session");
 	}
 }

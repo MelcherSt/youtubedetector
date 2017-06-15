@@ -18,8 +18,8 @@ public class InputHandler {
 		// Register all available handlers
 		cmdHandlerMap.put("-a", HarAddHandler.class);
 		cmdHandlerMap.put("--add", HarAddHandler.class);
-		cmdHandlerMap.put("-r", RealTimeHandler.class);
-		cmdHandlerMap.put("--real", RealTimeHandler.class);
+		cmdHandlerMap.put("-r", AduDumpInputHandler.class);
+		cmdHandlerMap.put("--real", AduDumpInputHandler.class);
 		cmdHandlerMap.put("-s", WindowReposSaveHandler.class);
 		cmdHandlerMap.put("--save", WindowReposSaveHandler.class);
 	}
