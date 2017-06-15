@@ -45,24 +45,17 @@ public class DetectorConnection {
 
 	/**
 	 * Push adudump input line and process.
-	 * @param line The adudump line.
+	 * @param segmentSize The size of an incoming video segment in bytes.
 	 */
-	public void pushAdu(AduLine line) {
-		if(line.getType() == AduLine.InferredType.ADU
-				&& line.getDirection() == AduLine.Direction.INCOMING
-				&& line.getSize() > HarFilter.SEGMENT_SIZE_THRESHOLD) {
-			// Process ADU segment
-			aduBytes.add(line.getSize());
-			if(aduBytes.size() >= WindowFactory.WINDOW_SIZE) {
-				// We have at least one complete window. Calculate total size.
-				int startIndex = aduBytes.size() - (WindowFactory.WINDOW_SIZE - 1);
-				int endIndex = aduBytes.size();
-				int size = aduBytes.subList(startIndex, endIndex).stream().mapToInt(Integer::intValue).sum();
-				processWindow(size);
-			}
-		} else if(line.getType() == AduLine.InferredType.END) {
-			// Connection ends here. Close down detector.
-			writeResults();
+	public void pushSegment(int segmentSize) {
+		// Process ADU segment
+		aduBytes.add(segmentSize);
+		if(aduBytes.size() >= WindowFactory.WINDOW_SIZE) {
+			// We have at least one complete window. Calculate total size.
+			int startIndex = aduBytes.size() - (WindowFactory.WINDOW_SIZE - 1);
+			int endIndex = aduBytes.size();
+			int windowSize = aduBytes.subList(startIndex, endIndex).stream().mapToInt(Integer::intValue).sum();
+			processWindow(windowSize);
 		}
 	}
 
