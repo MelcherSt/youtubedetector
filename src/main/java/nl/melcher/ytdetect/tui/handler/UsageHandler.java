@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * Handler to simply print usage details
  */
-public class UsageHandler implements ICmdHandler {
+public class UsageHandler implements IHandler {
 	@Override
 	public void handle(List<String> args) {
 		System.out.println("Usage details");

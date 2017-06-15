@@ -26,6 +26,11 @@ public class DetectorConnection {
 	private List<Integer> aduBytes = new ArrayList<>();
 
 	/**
+	 * Identifier for the connection this detector works on.
+	 */
+	private String connectionAddr;
+
+	/**
 	 * Mapping candidate videos to their occurrence.
 	 */
 	private Map<VideoIdentifier, Integer> candidateCountMap = new HashMap<>();
@@ -37,10 +42,7 @@ public class DetectorConnection {
 	 */
 	private List<VideoIdentifier> lastCandidates = new ArrayList<>();
 
-	/**
-	 * Identifier for the connection this detector works on.
-	 */
-	private String connectionAddr;
+	private List<DetectorBackEnd> backEnds = new ArrayList<>();
 
 	public DetectorConnection(String connectionAddr) {
 		this.connectionAddr = connectionAddr;
@@ -72,8 +74,9 @@ public class DetectorConnection {
 	 */
 	private void processWindow(int size) {
 		// Create new back end. Add it to the map and get matches.
-		DetectorBackEnd backEnd = new DetectorBackEnd(WindowRepository.getInstance().getWindows());
-		List<Window> windowMatches = backEnd.findMatches(size);
+		DetectorBackEnd backEnd = new DetectorBackEnd();
+		List<Window> windowMatches = backEnd.next(size).getCurrentState();
+				//.findMatches(size);
 		List<VideoIdentifier> curCandidates = new ArrayList<>();
 
 		// Handle all matches
@@ -118,34 +121,37 @@ public class DetectorConnection {
 	 * Wrap things up. Report back stats and clear all maps for a fresh start.
 	 */
 	public void writeResults() {
-		List<VideoIdentifier> toBeRemoved = new ArrayList<>();
-		candidateCountMap.entrySet().forEach(e -> { if( e.getValue() < 0) { toBeRemoved.add(e.getKey());}});
-		toBeRemoved.forEach(candidateCountMap::remove);
-
-		int total = candidateCountMap.values().stream().mapToInt(Integer::intValue).sum();
-		Map<Integer, Set<VideoIdentifier>> countMap = new HashMap<>();
-
-		for(Map.Entry<VideoIdentifier, Integer> entry : candidateCountMap.entrySet()) {
-			int count = entry.getValue();
-			Set<VideoIdentifier> vids = countMap.containsKey(count) ? countMap.get(count) : new HashSet<>();
-			vids.add(entry.getKey());
-			countMap.put(count, vids);
-		}
-
-		SortedSet<Integer> sorted = new TreeSet<>(countMap.keySet()).descendingSet();
-		for(Integer count: sorted) {
-			double percentage = Double.valueOf(count) / total * 100;
-			Set<VideoIdentifier> vids = countMap.get(count);
-			Logger.log("===================");
-			Logger.log(count + " matches, resulting in a " + percentage + "% match");
-			for(VideoIdentifier vId : vids) {
-				Logger.log(vId.toString());
-			}
-		}
-
 		if(aduBytes.size() < WindowFactory.WINDOW_SIZE) {
-			Logger.log("No results to report for " + connectionAddr);
+			Logger.write("No results to report for " + connectionAddr);
 		} else {
+			Logger.write("Results for " + connectionAddr);
+
+			List<VideoIdentifier> toBeRemoved = new ArrayList<>();
+			candidateCountMap.entrySet().forEach(e -> { if( e.getValue() < 0) { toBeRemoved.add(e.getKey());}});
+			toBeRemoved.forEach(candidateCountMap::remove);
+
+			int total = candidateCountMap.values().stream().mapToInt(Integer::intValue).sum();
+			Map<Integer, Set<VideoIdentifier>> countMap = new HashMap<>();
+
+			for(Map.Entry<VideoIdentifier, Integer> entry : candidateCountMap.entrySet()) {
+				int count = entry.getValue();
+				Set<VideoIdentifier> vids = countMap.containsKey(count) ? countMap.get(count) : new HashSet<>();
+				vids.add(entry.getKey());
+				countMap.put(count, vids);
+			}
+
+			SortedSet<Integer> sorted = new TreeSet<>(countMap.keySet()).descendingSet();
+			for(Integer count: sorted) {
+				double percentage = Double.valueOf(count) / total * 100;
+				Set<VideoIdentifier> vids = countMap.get(count);
+				Logger.write("===================");
+				Logger.write(count + " matches, resulting in a " + percentage + "% match");
+				for(VideoIdentifier vId : vids) {
+					Logger.write(vId.getTitle());
+				}
+			}
+
+			Logger.write("");
 			calcCoefficient();
 
 		}
@@ -168,7 +174,7 @@ public class DetectorConnection {
 		for(Integer i : windowBytes) {
 			sb.append(i + ",");
 		}
-		Logger.log(sb.toString());
+		Logger.write(sb.toString());
 
 		/* end */
 
@@ -180,7 +186,7 @@ public class DetectorConnection {
 			for(Integer i : entry.getValue()) {
 				sb.append(i + ",");
 			}
-			Logger.log(sb.toString());
+			Logger.write(sb.toString());
 
 			List<Integer> vidWindowBytes = entry.getValue();
 			if(vidWindowBytes.size() < windowBytes.size()) {
@@ -194,7 +200,7 @@ public class DetectorConnection {
 
 				double corell = pearsonsCorrelation.correlation(windowBytes.stream().mapToDouble(Integer::doubleValue).toArray(),
 						subVidWindowBytes.stream().mapToDouble(Integer::doubleValue).toArray());
-				Logger.log(entry.getKey() + " Corell: " + corell);
+				Logger.write(entry.getKey() + " Corell: " + corell);
 				startIndex += 1;
 			}
 		}

@@ -2,7 +2,6 @@ package nl.melcher.ytdetect.fingerprinting;
 
 import lombok.Getter;
 import nl.melcher.ytdetect.tui.utils.Logger;
-import sun.rmi.runtime.Log;
 
 import java.io.*;
 import java.util.*;
@@ -43,9 +42,9 @@ public class WindowRepository {
 			WINDOWS.clear();
 			WINDOWS.addAll((List<Window>)inputStream.readObject());
 		} catch(ClassNotFoundException | InvalidClassException ex) {
-			Logger.log("Could not deserialize windows from file '" + fileName + "'");
+			Logger.write("Could not deserialize windows from file '" + fileName + "'");
 		} catch(FileNotFoundException ex) {
-			Logger.log("File '" + fileName + "' was not found. Please create this file first using the '-a' and '-s' switches.");
+			Logger.write("File '" + fileName + "' was not found. Please create this file first using the '-a' and '-s' switches.");
 		}
 	}
 

@@ -17,7 +17,7 @@ import java.util.List;
 /**
  * Add a video using HAR and video information.
  */
-public class HarAddHandler implements ICmdHandler {
+public class HarAddHandler implements IHandler {
 
 	@Override
 	public void handle(List<String> args) throws InvalidArgumentsException {
@@ -105,9 +105,9 @@ public class HarAddHandler implements ICmdHandler {
 			// Add to repository
 			WindowRepository.getInstance().addWindows(windows);
 
-			Logger.log("");
-			Logger.log("Created " + windows.size() + " windows from " +  fingerprint.size() + " segments for video " + vidTitle + "/" + vidLen + "/" + vidQuality);
-			Logger.log("------");
+			Logger.write("");
+			Logger.write("Created " + windows.size() + " windows from " +  fingerprint.size() + " segments for video " + vidTitle + "/" + vidLen + "/" + vidQuality);
+			Logger.write("------");
 		} catch (RuntimeException e) {
 			System.out.println(e.getMessage());
 		}

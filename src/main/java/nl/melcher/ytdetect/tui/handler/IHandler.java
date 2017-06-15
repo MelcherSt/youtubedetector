@@ -5,9 +5,9 @@ import nl.melcher.ytdetect.tui.InvalidArgumentsException;
 import java.util.List;
 
 /**
- * Command handler interface
+ * Command line handler interface
  */
-public interface ICmdHandler {
+public interface IHandler {
 
 	void handle(List<String> args) throws InvalidArgumentsException;
 }

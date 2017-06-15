@@ -17,7 +17,7 @@ import java.util.Map;
  * Parses incoming adudump lines and delegates ADU segments to detectors.
  * (when piped to adudump like so: "sudo ./adudump -l 192.168.1./16 if:enps0 | java -jar ytdetector.jar -r")
  */
-public class RealTimeHandler implements ICmdHandler {
+public class RealTimeHandler implements IHandler {
 	@Override
 	public void handle(List<String> args) throws InvalidArgumentsException {
 		System.out.println("Real-time mode. Awaiting input...");

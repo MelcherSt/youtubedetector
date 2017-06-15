@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 /**
  * Save all windows currently in {@link WindowRepository}.
  */
-public class WindowReposSaveHandler implements ICmdHandler {
+public class WindowReposSaveHandler implements IHandler {
 	@Override
 	public void handle(List<String> args) throws InvalidArgumentsException {
 		/**

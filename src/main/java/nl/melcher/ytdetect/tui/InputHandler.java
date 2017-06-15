@@ -12,7 +12,7 @@ import java.util.*;
  */
 public class InputHandler {
 
-	private final Map<String, Class<? extends ICmdHandler>> cmdHandlerMap = new HashMap<>();
+	private final Map<String, Class<? extends IHandler>> cmdHandlerMap = new HashMap<>();
 
 	{
 		// Register all available handlers
@@ -32,11 +32,11 @@ public class InputHandler {
 			return;
 		}
 
-		Class<? extends ICmdHandler> clazz = cmdHandlerMap.getOrDefault(args.get(0), UsageHandler.class);
+		Class<? extends IHandler> clazz = cmdHandlerMap.getOrDefault(args.get(0), UsageHandler.class);
 		args.remove(0);
 
 		try {
-			ICmdHandler cmdHandler = clazz.newInstance();
+			IHandler cmdHandler = clazz.newInstance();
 			cmdHandler.handle(args);
 		} catch (InvalidArgumentsException e) {
 			System.out.println("An error occurred while parsing arguments: " + e.getMessage());
