@@ -4,15 +4,12 @@ import de.sstoehr.harreader.HarReader;
 import de.sstoehr.harreader.HarReaderException;
 import de.sstoehr.harreader.model.Har;
 import de.sstoehr.harreader.model.HarEntry;
-import de.sstoehr.harreader.model.HarLog;
-import de.sstoehr.harreader.model.HarResponse;
 import lombok.AllArgsConstructor;
 import nl.melcher.ytdetect.Config;
 import nl.melcher.ytdetect.tui.utils.Logger;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * HAR filter.

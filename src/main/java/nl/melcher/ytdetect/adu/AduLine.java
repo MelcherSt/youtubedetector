@@ -2,7 +2,6 @@ package nl.melcher.ytdetect.adu;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import nl.melcher.ytdetect.tui.utils.Logger;
 
 /**
  * Partly representation of a single line of `adudump` output.

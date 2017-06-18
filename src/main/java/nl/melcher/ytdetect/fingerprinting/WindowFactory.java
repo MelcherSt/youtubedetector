@@ -4,10 +4,7 @@ import lombok.AllArgsConstructor;
 import nl.melcher.ytdetect.Config;
 import nl.melcher.ytdetect.VideoIdentifier;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Build windows of size WINDOW_SIZE from a list of segments.

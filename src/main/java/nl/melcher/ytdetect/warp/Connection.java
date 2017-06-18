@@ -1,20 +1,19 @@
-package nl.melcher.ytdetect.detector;
+package nl.melcher.ytdetect.warp;
 
 import nl.melcher.ytdetect.Config;
 import nl.melcher.ytdetect.VideoIdentifier;
 import nl.melcher.ytdetect.fingerprinting.Window;
-import nl.melcher.ytdetect.fingerprinting.WindowFactory;
 import nl.melcher.ytdetect.tui.utils.Logger;
 import org.apache.commons.math3.stat.correlation.PearsonsCorrelation;
 
 import java.util.*;
 
 /**
- * Represents a connection. Handles incoming ADUs and controls instances of {@link DetectorNFA}.
- * The {@link DetectorConnection} oversees all reported window matches from back ends and constructs
+ * Represents a connection. Handles incoming ADUs and controls instances of {@link StateMachine}.
+ * The {@link Connection} oversees all reported window matches from NFAs and constructs
  * a list of candidates based on this information.
  */
-public class DetectorConnection {
+public class Connection {
 
 	private static final int BONUS = 2;
 
@@ -24,7 +23,7 @@ public class DetectorConnection {
 	private List<Integer> aduBytes = new ArrayList<>();
 
 	/**
-	 * Identifier for the connection this detector works on.
+	 * Identifier for the connection this warp works on.
 	 */
 	private String connectionAddr;
 
@@ -36,9 +35,9 @@ public class DetectorConnection {
 	/**
 	 * List of all currently active detectors
 	 */
-	private List<DetectorNFA> backEndList = new ArrayList<>();
+	private List<StateMachine> backEndList = new ArrayList<>();
 
-	public DetectorConnection(String connectionAddr) {
+	public Connection(String connectionAddr) {
 		this.connectionAddr = connectionAddr;
 	}
 
@@ -63,20 +62,20 @@ public class DetectorConnection {
 	 * @param size The window size in bytes.
 	 */
 	private void processWindow(int size) {
-		// Create new detector in initial state
-		DetectorNFA detectorBackEnd = new DetectorNFA();
+		// Create new warp in initial state
+		StateMachine detectorBackEnd = new StateMachine();
 		backEndList.add(detectorBackEnd);
 
-		List<DetectorNFA> backEndRemoveList = new ArrayList<>();
-		for(DetectorNFA backEnd : backEndList) {
-			List<Window> curMatches = backEnd.apply(size).getCurrentState();
+		List<StateMachine> backEndRemoveList = new ArrayList<>();
+		for(StateMachine backEnd : backEndList) {
+			List<Window> curMatches = backEnd.apply(size).getState();
 
 			if(curMatches.size() == 0) {
 				backEndRemoveList.add(backEnd);
 				continue;
 			}
 
-			// List of candidate videos processed in this iteration of the detector.
+			// List of candidate videos processed in this iteration of the warp.
 			List<VideoIdentifier> curCandidates = new ArrayList<>();
 			for(Window match : curMatches) {
 				VideoIdentifier videoIdentifier = match.getVideoIdentifier();
@@ -104,7 +103,7 @@ public class DetectorConnection {
 	}
 
 	/**
-	 * Write the -intermediary- results for this detector connection.
+	 * Write the -intermediary- results for this warp connection.
 	 */
 	public void writeResults() {
 		if(aduBytes.size() < Config.WINDOW_SIZE) {
@@ -142,7 +141,7 @@ public class DetectorConnection {
 		}
 	}
 
-	private void calcCoefficient() {
+	/*private void calcCoefficient() {
 		// Prepare
 		List<Integer> windowBytes = getWindowsFromAduSegments();
 		Map<VideoIdentifier, List<Integer>> vidWindowBytesMap = new HashMap<>();
@@ -175,10 +174,10 @@ public class DetectorConnection {
 
 	}
 
-	/**
-	 * Get a list of non-overlapping window sizes from the ADU input on the detector.
+	*//**
+	 * Get a list of non-overlapping window sizes from the ADU input on the warp.
 	 * @return List of windows.
-	 */
+	 *//*
 	private List<Integer> getWindowsFromAduSegments() {
 		List<Integer> result = new ArrayList<>();
 		int curWindowBytes = 0;
@@ -196,11 +195,11 @@ public class DetectorConnection {
 		return result;
 	}
 
-	/**
+	*//**
 	 * Get a list of non-overlapping window sizes for a video.
 	 * @param videoIdentifier
 	 * @return List of windows.
-	 */
+	 *//*
 	private List<Integer> getWindowsFromVideo(VideoIdentifier videoIdentifier) {
 		List<Integer> result = new ArrayList<>();
 		int startIndex = 0;
@@ -209,5 +208,5 @@ public class DetectorConnection {
 			startIndex += Config.WINDOW_SIZE;
 		}
 		return result;
-	}
+	}*/
 }

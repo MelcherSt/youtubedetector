@@ -1,4 +1,4 @@
-package nl.melcher.ytdetect.detector;
+package nl.melcher.ytdetect.warp;
 
 import com.google.common.collect.*;
 import lombok.Getter;
@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * WARP NFA. Provides core window matching facilities.
  */
-class DetectorNFA {
+class StateMachine {
 
 	// Set of symbols
 	private SortedMultiset<Integer> symbols = TreeMultiset.create();
@@ -29,7 +29,7 @@ class DetectorNFA {
 	/**
 	 * Create NFA and initialize with windows from repository.
 	 */
-	public DetectorNFA() {
+	public StateMachine() {
 		updateTransitions(WindowRepository.getInstance().getWindows());
 	}
 
@@ -38,7 +38,7 @@ class DetectorNFA {
 	 * @param windowSize Symbol.
 	 * @return This NFA instance.
 	 */
-	public DetectorNFA apply(int windowSize) {
+	public StateMachine apply(int windowSize) {
 		// Empty current state
 		currentState.clear();
 
@@ -82,15 +82,15 @@ class DetectorNFA {
 	}
 
 	/**
-	 * Retrieve a copy of this NFA's current state.
+	 * Retrieve a copy of the current state.
 	 * @return List of windows.
 	 */
-	public List<Window> getCurrentState() {
+	public List<Window> getState() {
 		return new ArrayList<Window>(currentState);
 	}
 
 	/**
-	 * Create the symbols index map used for range selection.
+	 * Create the symbols list used for range selection.
 	 */
 	private void updateSymbols() {
 		symbols.clear();
@@ -98,7 +98,7 @@ class DetectorNFA {
 	}
 
 	/**
-	 * Update the transitions to the given list of windows.
+	 * Clear out the current transitions and set transitions according to given list of windows.
 	 * @param windows List of windows to set as transitions.
 	 */
 	private void updateTransitions(List<Window> windows) {
