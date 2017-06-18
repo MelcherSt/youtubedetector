@@ -37,10 +37,8 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-math3</artifactId>
             <version>3.6.1</version>
-        </dependency>
-
+        </dependency><!-- https://mvnrepository.com/artifact/org.apache.commons/commons-math3 -->
     </dependencies>
-
     <build>
         <plugins>
             <plugin>

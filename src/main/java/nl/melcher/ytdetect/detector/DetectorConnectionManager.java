@@ -1,5 +1,6 @@
 package nl.melcher.ytdetect.detector;
 
+import nl.melcher.ytdetect.Config;
 import nl.melcher.ytdetect.adu.AduLine;
 import nl.melcher.ytdetect.adu.MalformedAduLineException;
 import nl.melcher.ytdetect.fingerprinting.WindowFactory;
@@ -32,7 +33,7 @@ public class DetectorConnectionManager {
 
 			if (line.getType() == AduLine.InferredType.ADU
 					&& line.getDirection() == AduLine.Direction.INCOMING
-					&& line.getSize() > HarFilter.SEGMENT_SIZE_THRESHOLD) {
+					&& line.getSize() > Config.SEGMENT_SIZE_THRESHOLD) {
 				// Process ADU segment
 				detectorConnection.pushSegment(line.getSize());
 			} else if (line.getType() == AduLine.InferredType.END) {

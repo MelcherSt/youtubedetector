@@ -7,6 +7,7 @@ import de.sstoehr.harreader.model.HarEntry;
 import de.sstoehr.harreader.model.HarLog;
 import de.sstoehr.harreader.model.HarResponse;
 import lombok.AllArgsConstructor;
+import nl.melcher.ytdetect.Config;
 import nl.melcher.ytdetect.tui.utils.Logger;
 
 import java.io.File;
@@ -18,19 +19,11 @@ import java.util.List;
  */
 @AllArgsConstructor
 public class HarFilter {
-
-	/**
-	 * Filter threshold for segments in bytes.
-	 */
-	public static final long SEGMENT_SIZE_THRESHOLD = 400000;
-
 	private final String harFileName;
-
-	private final boolean showSegmentSizes = true;
 
 	/**
 	 * Filter HAR file.
-	 * @return All responses with size above {@value SEGMENT_SIZE_THRESHOLD} bytes.
+	 * @return All responses with size above SEGMENT_SIZE_THRESHOLD bytes.
 	 * @throws HarReaderException
 	 */
 	public List<Integer> filter() throws HarReaderException {
@@ -42,16 +35,13 @@ public class HarFilter {
 
 		for(HarEntry entry : harEntries) {
 			Long segmentSize = entry.getResponse().getBodySize();
-			if(segmentSize > SEGMENT_SIZE_THRESHOLD) {
+			if(segmentSize > Config.SEGMENT_SIZE_THRESHOLD) {
 				/* Generally, we aren't dealing with values
 				 great than INT.MAX_VALUE so it's save to cast */
 				segmentSizeList.add(segmentSize.intValue());
 
 				// Print the individual ADU segment sizes
-				if(showSegmentSizes) {
-					System.out.print(segmentSize.intValue() + ", ");
-				}
-
+				Logger.debug(segmentSize.intValue() + ", ");
 			}
 		}
 		return segmentSizeList;

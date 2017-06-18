@@ -1,17 +1,16 @@
 package nl.melcher.ytdetect.detector;
 
+import nl.melcher.ytdetect.Config;
 import nl.melcher.ytdetect.VideoIdentifier;
-import nl.melcher.ytdetect.adu.AduLine;
 import nl.melcher.ytdetect.fingerprinting.Window;
 import nl.melcher.ytdetect.fingerprinting.WindowFactory;
-import nl.melcher.ytdetect.har.HarFilter;
 import nl.melcher.ytdetect.tui.utils.Logger;
 import org.apache.commons.math3.stat.correlation.PearsonsCorrelation;
 
 import java.util.*;
 
 /**
- * Represents a connection. Handles incoming ADUs and controls instances of {@link Detector}.
+ * Represents a connection. Handles incoming ADUs and controls instances of {@link DetectorNFA}.
  * The {@link DetectorConnection} oversees all reported window matches from back ends and constructs
  * a list of candidates based on this information.
  */
@@ -37,7 +36,7 @@ public class DetectorConnection {
 	/**
 	 * List of all currently active detectors
 	 */
-	private List<Detector> backEndList = new ArrayList<>();
+	private List<DetectorNFA> backEndList = new ArrayList<>();
 
 	public DetectorConnection(String connectionAddr) {
 		this.connectionAddr = connectionAddr;
@@ -50,9 +49,9 @@ public class DetectorConnection {
 	public void pushSegment(int segmentSize) {
 		// Process ADU segment
 		aduBytes.add(segmentSize);
-		if(aduBytes.size() >= WindowFactory.WINDOW_SIZE) {
+		if(aduBytes.size() >= Config.WINDOW_SIZE) {
 			// We have at least one complete window. Calculate total size.
-			int startIndex = aduBytes.size() - (WindowFactory.WINDOW_SIZE - 1);
+			int startIndex = aduBytes.size() - (Config.WINDOW_SIZE - 1);
 			int endIndex = aduBytes.size();
 			int windowSize = aduBytes.subList(startIndex, endIndex).stream().mapToInt(Integer::intValue).sum();
 			processWindow(windowSize);
@@ -65,12 +64,12 @@ public class DetectorConnection {
 	 */
 	private void processWindow(int size) {
 		// Create new detector in initial state
-		Detector detectorBackEnd = new Detector();
+		DetectorNFA detectorBackEnd = new DetectorNFA();
 		backEndList.add(detectorBackEnd);
 
-		List<Detector> backEndRemoveList = new ArrayList<>();
-		for(Detector backEnd : backEndList) {
-			List<Window> curMatches = backEnd.next(size).getCurrentState();
+		List<DetectorNFA> backEndRemoveList = new ArrayList<>();
+		for(DetectorNFA backEnd : backEndList) {
+			List<Window> curMatches = backEnd.apply(size).getCurrentState();
 
 			if(curMatches.size() == 0) {
 				backEndRemoveList.add(backEnd);
@@ -108,7 +107,7 @@ public class DetectorConnection {
 	 * Write the -intermediary- results for this detector connection.
 	 */
 	public void writeResults() {
-		if(aduBytes.size() < WindowFactory.WINDOW_SIZE) {
+		if(aduBytes.size() < Config.WINDOW_SIZE) {
 			Logger.write("No results to report for " + connectionAddr);
 		} else {
 			Logger.write("Results for " + connectionAddr);
@@ -188,7 +187,7 @@ public class DetectorConnection {
 		for (Integer adu : aduBytes) {
 			curWindowBytes += adu;
 			curWindowSize +=1;
-			if (curWindowSize == WindowFactory.WINDOW_SIZE) {
+			if (curWindowSize == Config.WINDOW_SIZE) {
 				result.add(curWindowBytes);
 				curWindowBytes = 0;
 				curWindowSize = 0;
@@ -207,7 +206,7 @@ public class DetectorConnection {
 		int startIndex = 0;
 		while(videoIdentifier.getWindowMap().containsKey(startIndex)) {
 			result.add(videoIdentifier.getWindowMap().get(startIndex).getSize());
-			startIndex += WindowFactory.WINDOW_SIZE;
+			startIndex += Config.WINDOW_SIZE;
 		}
 		return result;
 	}
