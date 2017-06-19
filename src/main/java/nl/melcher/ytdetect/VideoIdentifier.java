@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Identifies a YouTube video
+ * Identifies a YouTube video.
  */
 public class VideoIdentifier implements Serializable {
 
@@ -31,7 +31,7 @@ public class VideoIdentifier implements Serializable {
 	@Setter @Getter private int aduCount = 0;
 
 	/**
-	 * Map start index to a window
+	 * Map window start index to a window instance.
 	 */
 	@Getter public final Map<Integer, Window> windowMap = new HashMap<>();
 

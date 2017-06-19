@@ -13,6 +13,12 @@ public class Logger {
 
 	public static void debug(String message) {
 		if (VERBOSE) {
+			System.out.print(message);
+		}
+	}
+
+	public static void debugln(String message) {
+		if (VERBOSE) {
 			System.out.println("[DEBUG] " + message);
 		}
 	}

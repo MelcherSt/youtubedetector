@@ -4,7 +4,6 @@ import nl.melcher.ytdetect.Config;
 import nl.melcher.ytdetect.VideoIdentifier;
 import nl.melcher.ytdetect.fingerprinting.Window;
 import nl.melcher.ytdetect.tui.utils.Logger;
-import org.apache.commons.math3.stat.correlation.PearsonsCorrelation;
 
 import java.util.*;
 
@@ -68,7 +67,7 @@ public class Connection {
 
 		List<StateMachine> backEndRemoveList = new ArrayList<>();
 		for(StateMachine backEnd : backEndList) {
-			List<Window> curMatches = backEnd.apply(size).getState();
+			List<Window> curMatches = backEnd.applySymbol(size).getState();
 
 			if(curMatches.size() == 0) {
 				backEndRemoveList.add(backEnd);

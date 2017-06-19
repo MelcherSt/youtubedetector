@@ -13,7 +13,7 @@ import java.util.List;
 public class Window implements Serializable, Comparable {
 
 	/**
-	 * List of segment sizes in bytes.
+	 * Ordered list of segment sizes in bytes.
 	 */
 	private List<Integer> segmentBytes;
 
@@ -28,7 +28,7 @@ public class Window implements Serializable, Comparable {
 	@Getter	private int startIndex;
 
 	/**
-	 * End segment no.
+	 * End segment no. (generally the start index + WINDOW_SIZE)
 	 */
 	@Getter	private int endIndex;
 

@@ -5,7 +5,7 @@ package nl.melcher.ytdetect;
  */
 public class Config {
 	public static final double TLS_MIN = 1.0023;
-	public static final double TLS_MAX = 1.0017;
+	public static final double TLS_MAX = 1.0019;
 
 	/**
 	 * Assumed size of HTTP header.

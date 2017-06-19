@@ -15,7 +15,7 @@ import java.util.List;
  */
 class StateMachine {
 
-	// Set of symbols
+	// Set of accepted symbols
 	private SortedMultiset<Integer> symbols = TreeMultiset.create();
 
 	// Map of symbols to state
@@ -36,9 +36,9 @@ class StateMachine {
 	/**
 	 * Apply symbol to update state.
 	 * @param windowSize Symbol.
-	 * @return This NFA instance.
+	 * @return This state machine with symbol applied.
 	 */
-	public StateMachine apply(int windowSize) {
+	public StateMachine applySymbol(int windowSize) {
 		// Empty current state
 		currentState.clear();
 
@@ -57,19 +57,16 @@ class StateMachine {
 			Logger.debug("Matched key: " + symbol);
 			currentState.addAll(transitions.get(symbol));
 
-			// TODO: remove block of debug output
 			for(Window wind : transitions.get(symbol)) {
 				Logger.debug("Index: " + wind.getStartIndex());
 				Logger.debug(wind.getVideoIdentifier().getTitle());
-			}
 
-			// Find the next expected state
-			transitions.get(symbol).forEach(e -> {
-				Window nextWindow = e.getVideoIdentifier().getWindowMap().get(e.getStartIndex() + 1);
+				// Find the next expected state
+				Window nextWindow = wind.getVideoIdentifier().getWindowMap().get(wind.getStartIndex() + 1);
 				if(nextWindow != null) {
 					expectedWindows.add(nextWindow);
 				}
-			});
+			}
 		}
 
 		Logger.debug("========================");
