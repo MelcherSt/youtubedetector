@@ -55,10 +55,7 @@ public class AduLine {
 	 */
 	public static boolean isTLS(String addr) {
 		String[] segm = addr.split("\\.");
-		if (segm.length == 0) {
-			return false;
-		}
-		return (segm[segm.length -1]).equals("443");
+		return segm.length != 0 && (segm[segm.length - 1]).equals("443");
 	}
 
 	public enum InferredType {

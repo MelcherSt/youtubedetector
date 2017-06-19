@@ -25,10 +25,10 @@ public class InputHandler {
 	}
 
 	public void handle(String[] rawArgs) {
-		List<String> args = new LinkedList<String>(Arrays.asList(rawArgs));
+		List<String> args = new LinkedList<>(Arrays.asList(rawArgs));
 		if(args.size() < 1) {
 			args.add("");
-		} else if(args.get(0) == "q") {
+		} else if(args.get(0).equals("q")) {
 			return;
 		}
 
@@ -40,9 +40,7 @@ public class InputHandler {
 			cmdHandler.handle(args);
 		} catch (InvalidArgumentsException e) {
 			System.out.println("An error occurred while parsing arguments: " + e.getMessage());
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-		} catch (InstantiationException e) {
+		} catch (IllegalAccessException | InstantiationException e) {
 			e.printStackTrace();
 		}
 

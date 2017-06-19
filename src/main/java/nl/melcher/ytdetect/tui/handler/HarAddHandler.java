@@ -50,14 +50,13 @@ public class HarAddHandler implements IHandler {
 
 	private void handleLine(List<String> args)  throws InvalidArgumentsException {
 		String harFile = args.get(0);
-		String vidTitle = null;
+		String vidTitle;
 		Integer vidQuality = -1;
 		Integer vidLen = -1;
 		String vidUrl = "";
 
-		int index = -1;
+		int index;
 		if((index = args.indexOf("-t")) != -1 || (index = args.indexOf("--title")) != -1 ) {
-			StringBuilder strb = new StringBuilder();
 			vidTitle = args.get(index + 1);
 		} else {
 			throw new InvalidArgumentsException("Should at least define a title for video");

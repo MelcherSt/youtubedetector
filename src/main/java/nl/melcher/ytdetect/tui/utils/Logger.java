@@ -1,7 +1,7 @@
 package nl.melcher.ytdetect.tui.utils;
 
 /**
- * Created by melcher on 31-5-17.
+ * Logger class writes to console.
  */
 public class Logger {
 	/** Control whether debug output is visible **/

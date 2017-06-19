@@ -5,10 +5,6 @@ package nl.melcher.ytdetect.tui;
  */
 public class InvalidArgumentsException extends Exception {
 
-	public InvalidArgumentsException() {
-		super();
-	}
-
 	public InvalidArgumentsException(String message) {
 		super(message);
 	}

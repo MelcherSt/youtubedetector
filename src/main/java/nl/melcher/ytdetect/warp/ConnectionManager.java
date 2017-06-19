@@ -7,14 +7,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by melcher on 15-6-17.
+ * Manages connections.
  */
 public class ConnectionManager {
 
 	/**
 	 * Map connection address to warp
 	 */
-	Map<String, Connection> connectionMap = new HashMap<>();
+	private final Map<String, Connection> connectionMap = new HashMap<>();
 
 	/**
 	 * Push an ADU segment to its connection.
@@ -42,7 +42,7 @@ public class ConnectionManager {
 			} else if (line.getType() == AduLine.InferredType.END) {
 				// Connection ends here. Close down warp.
 				connection.writeResults();
-				connectionMap.remove(connection);
+				connectionMap.remove(connection.getConnectionAddr());
 			}
 		}
 	}

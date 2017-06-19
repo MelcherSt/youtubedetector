@@ -1,5 +1,6 @@
 package nl.melcher.ytdetect.warp;
 
+import lombok.Getter;
 import nl.melcher.ytdetect.Config;
 import nl.melcher.ytdetect.VideoIdentifier;
 import nl.melcher.ytdetect.fingerprinting.Window;
@@ -19,22 +20,22 @@ public class Connection {
 	/**
 	 * List of incoming ADU sizes in bytes including any HTTP and/or TLS overhead still.
 	 */
-	private List<Integer> aduBytes = new ArrayList<>();
+	private final List<Integer> aduBytes = new ArrayList<>();
 
 	/**
 	 * Identifier for the connection this warp works on.
 	 */
-	private String connectionAddr;
+	@Getter private String connectionAddr;
 
 	/**
 	 * Mapping candidate videos to their occurrence.
 	 */
-	private Map<VideoIdentifier, Integer> candidateCountMap = new HashMap<>();
+	private final Map<VideoIdentifier, Integer> candidateCountMap = new HashMap<>();
 
 	/**
 	 * List of all currently active detectors
 	 */
-	private List<StateMachine> stateMachines = new ArrayList<>();
+	private final List<StateMachine> stateMachines = new ArrayList<>();
 
 	public Connection(String connectionAddr) {
 		this.connectionAddr = connectionAddr;
@@ -136,77 +137,6 @@ public class Connection {
 					Logger.write(vId.getTitle());
 				}
 			}
-			//Logger.write("");
-			//calcCoefficient();
 		}
 	}
-
-	/*private void calcCoefficient() {
-		// Prepare
-		List<Integer> windowBytes = getWindowsFromAduSegments();
-		Map<VideoIdentifier, List<Integer>> vidWindowBytesMap = new HashMap<>();
-		for (VideoIdentifier vid : candidateCountMap.keySet()) {
-			vidWindowBytesMap.put(vid, getWindowsFromVideo(vid));
-		}
-
-		// Calculate pearson's coefficient
-		PearsonsCorrelation pearsonsCorrelation = new PearsonsCorrelation();
-
-		for(Map.Entry<VideoIdentifier, List<Integer>> entry : vidWindowBytesMap.entrySet()) {
-
-
-			List<Integer> vidWindowBytes = entry.getValue();
-			if(vidWindowBytes.size() < windowBytes.size()) {
-				continue;
-			}
-
-			int startIndex = 0;
-
-			while(windowBytes.size() + startIndex < vidWindowBytes.size()) {
-				List<Integer> subVidWindowBytes = vidWindowBytes.subList(startIndex, windowBytes.size() + startIndex);
-
-				double corell = pearsonsCorrelation.correlation(windowBytes.stream().mapToDouble(Integer::doubleValue).toArray(),
-						subVidWindowBytes.stream().mapToDouble(Integer::doubleValue).toArray());
-				Logger.write(entry.getKey() + " Corell: " + corell);
-				startIndex += 1;
-			}
-		}
-
-	}
-
-	*//**
-	 * Get a list of non-overlapping window sizes from the ADU input on the warp.
-	 * @return List of windows.
-	 *//*
-	private List<Integer> getWindowsFromAduSegments() {
-		List<Integer> result = new ArrayList<>();
-		int curWindowBytes = 0;
-		int curWindowSize = 0;
-
-		for (Integer adu : aduBytes) {
-			curWindowBytes += adu;
-			curWindowSize +=1;
-			if (curWindowSize == Config.WINDOW_SIZE) {
-				result.add(curWindowBytes);
-				curWindowBytes = 0;
-				curWindowSize = 0;
-			}
-		}
-		return result;
-	}
-
-	*//**
-	 * Get a list of non-overlapping window sizes for a video.
-	 * @param videoIdentifier
-	 * @return List of windows.
-	 *//*
-	private List<Integer> getWindowsFromVideo(VideoIdentifier videoIdentifier) {
-		List<Integer> result = new ArrayList<>();
-		int startIndex = 0;
-		while(videoIdentifier.getWindowMap().containsKey(startIndex)) {
-			result.add(videoIdentifier.getWindowMap().get(startIndex).getSize());
-			startIndex += Config.WINDOW_SIZE;
-		}
-		return result;
-	}*/
 }

@@ -14,8 +14,8 @@ public class AduDumpParser {
 
 	/**
 	 * Parses a complete file.
-	 * @param fileName
-	 * @return
+	 * @param fileName File containing adudump output.
+	 * @return A list of {@link AduLine} instances.
 	 * @throws IOException
 	 */
 	public static List<AduLine> parseFile(String fileName) throws IOException {
@@ -26,8 +26,8 @@ public class AduDumpParser {
 
 	/**
 	 * Parses a single line.
-	 * @param aduDumpLine
-	 * @return
+	 * @param aduDumpLine A single line of adudump output.
+	 * @return An {@link AduLine} instance.
 	 */
 	public static AduLine parseLine(String aduDumpLine) throws MalformedAduLineException {
 		String[] parts = aduDumpLine.split(" ");

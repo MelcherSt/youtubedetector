@@ -16,13 +16,13 @@ import java.util.List;
 class StateMachine {
 
 	// Set of accepted symbols
-	private SortedMultiset<Integer> symbols = TreeMultiset.create();
+	private final SortedMultiset<Integer> symbols = TreeMultiset.create();
 
 	// Map of symbols to state
-	private Multimap<Integer, Window> transitions = TreeMultimap.create();
+	private final Multimap<Integer, Window> transitions = TreeMultimap.create();
 
 	// Representation of current state
-	private List<Window> currentState = new ArrayList<>();
+	private final List<Window> currentState = new ArrayList<>();
 
 	@Getter private int generation = 0;
 
@@ -83,7 +83,7 @@ class StateMachine {
 	 * @return List of windows.
 	 */
 	public List<Window> getState() {
-		return new ArrayList<Window>(currentState);
+		return new ArrayList<>(currentState);
 	}
 
 	/**
@@ -100,7 +100,7 @@ class StateMachine {
 	 */
 	private void updateTransitions(List<Window> windows) {
 		transitions.clear();
-		windows.stream().forEach(e -> { transitions.put(e.getSize(), e);});
+		windows.forEach(e -> transitions.put(e.getSize(), e));
 		updateSymbols();
 	}
 }

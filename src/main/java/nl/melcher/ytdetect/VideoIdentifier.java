@@ -1,12 +1,11 @@
 package nl.melcher.ytdetect;
 
-import lombok.*;
-import nl.melcher.ytdetect.fingerprinting.Window;
+import lombok.Getter;
+import lombok.Setter;
 import nl.melcher.ytdetect.fingerprinting.Window;
 
 import java.io.Serializable;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**

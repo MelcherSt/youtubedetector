@@ -26,7 +26,7 @@ public class WindowFactory {
 
 		// Slide the window along the array of segment sizes
 		while(lastIndex < (segmentBytes.size() + 1)) {
-			List<Integer> sublist = new ArrayList(segmentBytes.subList(firstIndex, lastIndex));
+			ArrayList sublist = new ArrayList(segmentBytes.subList(firstIndex, lastIndex));
 			Window window = new Window(sublist, videoIdentifier, firstIndex, lastIndex);
 			result.add(window);
 			videoIdentifier.getWindowMap().put(firstIndex, window);

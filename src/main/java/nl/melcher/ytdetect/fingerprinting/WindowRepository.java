@@ -26,7 +26,7 @@ public class WindowRepository {
 
 	private WindowRepository() {
 		try {
-			deserialize(WindowRepository.FILE_NAME);
+			deserialize();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -37,14 +37,14 @@ public class WindowRepository {
 	 * @throws IOException
 	 * @throws ClassNotFoundException
 	 */
-	public void deserialize(String fileName) throws IOException {
-		try(ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(fileName))) {
+	 private void deserialize() throws IOException {
+		try(ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(WindowRepository.FILE_NAME))) {
 			WINDOWS.clear();
 			WINDOWS.addAll((List<Window>)inputStream.readObject());
 		} catch(ClassNotFoundException | InvalidClassException ex) {
-			Logger.write("Could not deserialize windows from file '" + fileName + "'");
+			Logger.write("Could not deserialize windows from file '" + WindowRepository.FILE_NAME + "'");
 		} catch(FileNotFoundException ex) {
-			Logger.write("File '" + fileName + "' was not found. Please create this file first using the '-a' and '-s' switches.");
+			Logger.write("File '" + WindowRepository.FILE_NAME + "' was not found. Please create this file first using the '-a' and '-s' switches.");
 		}
 	}
 

@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 public class WindowReposSaveHandler implements IHandler {
 	@Override
 	public void handle(List<String> args) throws InvalidArgumentsException {
-		/**
+		/*
 		 * Acceptable formats:
 		 * -s
 		 * -s file.bin
