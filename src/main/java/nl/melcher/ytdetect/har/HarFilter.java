@@ -34,7 +34,7 @@ public class HarFilter {
 			Long segmentSize = entry.getResponse().getBodySize();
 			if(segmentSize > Config.SEGMENT_SIZE_THRESHOLD) {
 				/* Generally, we aren't dealing with values
-				 great than INT.MAX_VALUE so it's save to cast */
+				 exceeding INT.MAX_VALUE so it's save to cast */
 				segmentSizeList.add(segmentSize.intValue());
 
 				// Print the individual ADU segment sizes

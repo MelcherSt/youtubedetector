@@ -34,7 +34,7 @@ public class Connection {
 	/**
 	 * List of all currently active detectors
 	 */
-	private List<StateMachine> backEndList = new ArrayList<>();
+	private List<StateMachine> stateMachines = new ArrayList<>();
 
 	public Connection(String connectionAddr) {
 		this.connectionAddr = connectionAddr;
@@ -62,15 +62,16 @@ public class Connection {
 	 */
 	private void processWindow(int size) {
 		// Create new warp in initial state
-		StateMachine detectorBackEnd = new StateMachine();
-		backEndList.add(detectorBackEnd);
+		StateMachine newMachine = new StateMachine();
+		stateMachines.add(newMachine);
 
-		List<StateMachine> backEndRemoveList = new ArrayList<>();
-		for(StateMachine backEnd : backEndList) {
-			List<Window> curMatches = backEnd.applySymbol(size).getState();
+		List<StateMachine> invalidMachines = new ArrayList<>();
+		for(StateMachine stateMachine : stateMachines) {
+			List<Window> curMatches = stateMachine.applySymbol(size).getState();
 
+			// Throw away if no matches
 			if(curMatches.size() == 0) {
-				backEndRemoveList.add(backEnd);
+				invalidMachines.add(stateMachine);
 				continue;
 			}
 
@@ -90,15 +91,15 @@ public class Connection {
 				int score = 1;
 				if(candidateCountMap.containsKey(videoIdentifier)) {
 					score = candidateCountMap.get(videoIdentifier) +1;
-					if (backEnd.getGeneration() > 1) {
-						score += BONUS * (backEnd.getGeneration() -1);
+					if (stateMachine.getGeneration() > 1) {
+						score += BONUS * (stateMachine.getGeneration() -1);
 					}
 				}
 				candidateCountMap.put(videoIdentifier, score);
 			}
 		}
 		// Throw away detectors not producing any results anymore
-		backEndRemoveList.forEach(backEndList::remove);
+		invalidMachines.forEach(stateMachines::remove);
 	}
 
 	/**

@@ -43,23 +43,23 @@ class StateMachine {
 		currentState.clear();
 
 		// Define interval based on min/max TLS overhead -- removes HTTP header overhead as well
-		Double sizeMin = (windowSize / Config.TLS_MIN) - (Config.WINDOW_SIZE * Config.HTTP_HEADER_SIZE);
-		Double sizeMax = (windowSize / Config.TLS_MAX) - (Config.WINDOW_SIZE * Config.HTTP_HEADER_SIZE);
+		Double sizeMin = (windowSize / Config.TLS_MIN) - (Config.WINDOW_SIZE * Config.HTTP_HEADER_SIZE_MAX);
+		Double sizeMax = (windowSize / Config.TLS_MAX) - (Config.WINDOW_SIZE * Config.HTTP_HEADER_SIZE_MIN);
 
 		// Perform range search and retrieve indices
 		SortedMultiset<Integer> stateSymbols = symbols.subMultiset(sizeMin.intValue(), BoundType.OPEN, sizeMax.intValue(), BoundType.OPEN);
 		List<Window> expectedWindows = new ArrayList<>();
 
-		Logger.debug("Gen: " + generation + ", Frame size: " + windowSize + ", Range search: (" + sizeMin.intValue() + ", " + sizeMax.intValue() + ")");
+		Logger.debugln("Gen: " + generation + ", Frame size: " + windowSize + ", Range search: (" + sizeMin.intValue() + ", " + sizeMax.intValue() + ")");
 
 		// Find all states associated with the found symbols
 		for(Integer symbol : stateSymbols) {
-			Logger.debug("Matched key: " + symbol);
+			Logger.debugln("Matched key: " + symbol);
 			currentState.addAll(transitions.get(symbol));
 
 			for(Window wind : transitions.get(symbol)) {
-				Logger.debug("Index: " + wind.getStartIndex());
-				Logger.debug(wind.getVideoIdentifier().getTitle());
+				Logger.debugln("Index: " + wind.getStartIndex());
+				Logger.debugln(wind.getVideoIdentifier().getTitle());
 
 				// Find the next expected state
 				Window nextWindow = wind.getVideoIdentifier().getWindowMap().get(wind.getStartIndex() + 1);
@@ -69,7 +69,7 @@ class StateMachine {
 			}
 		}
 
-		Logger.debug("========================");
+		Logger.debugln("========================");
 
 		// Set new state
 		updateTransitions(expectedWindows);

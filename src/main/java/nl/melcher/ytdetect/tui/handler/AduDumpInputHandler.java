@@ -29,9 +29,9 @@ public class AduDumpInputHandler implements IHandler {
 			} catch (IOException e) {
 				Logger.write("Expected input, but none was given.");
 			} catch (MalformedAduLineException ex) {
-			// No more incoming valid ADU lines. Close down all connections.
-			man.finish();
-		}
+				// No more incoming valid ADU lines. Close down all connections.
+				man.finish();
+			}
 		}
 	}
 }

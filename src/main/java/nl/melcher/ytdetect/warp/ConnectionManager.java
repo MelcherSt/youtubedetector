@@ -53,7 +53,8 @@ public class ConnectionManager {
 	public void finish() {
 		for (Connection connection : connectionMap.values()) {
 			connection.writeResults();
-			connectionMap.remove(connection);
 		}
+
+		connectionMap.clear();
 	}
 }
