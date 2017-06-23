@@ -22,7 +22,7 @@ public class WindowFactory {
 
 		List<Window> result = new ArrayList<>();
 		int firstIndex = 0;
-		int lastIndex = Config.WINDOW_SIZE -1;
+		int lastIndex = Config.WINDOW_SIZE;
 
 		// Slide the window along the array of segment sizes
 		while(lastIndex < (segmentBytes.size() + 1)) {

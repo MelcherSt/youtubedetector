@@ -50,7 +50,7 @@ public class Connection {
 		aduBytes.add(segmentSize);
 		if(aduBytes.size() >= Config.WINDOW_SIZE) {
 			// We have at least one complete window. Calculate total size.
-			int startIndex = aduBytes.size() - (Config.WINDOW_SIZE - 1);
+			int startIndex = aduBytes.size() - (Config.WINDOW_SIZE);
 			int endIndex = aduBytes.size();
 			int windowSize = aduBytes.subList(startIndex, endIndex).stream().mapToInt(Integer::intValue).sum();
 			processWindow(windowSize);

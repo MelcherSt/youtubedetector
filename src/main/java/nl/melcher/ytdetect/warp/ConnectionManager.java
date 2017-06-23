@@ -2,6 +2,7 @@ package nl.melcher.ytdetect.warp;
 
 import nl.melcher.ytdetect.Config;
 import nl.melcher.ytdetect.adu.AduLine;
+import nl.melcher.ytdetect.tui.utils.Logger;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -37,6 +38,8 @@ public class ConnectionManager {
 			if (line.getType() == AduLine.InferredType.ADU
 					&& line.getDirection() == AduLine.Direction.INCOMING
 					&& line.getSize() > Config.SEGMENT_SIZE_THRESHOLD) {
+				Logger.debug("size: " + line.getSize());
+
 				// Process ADU segment
 				connection.pushSegment(line.getSize());
 			} else if (line.getType() == AduLine.InferredType.END) {

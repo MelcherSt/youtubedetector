@@ -47,7 +47,7 @@ public class Window implements Serializable, Comparable {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("Fingerprint[StartIndex=" + startIndex + ",EndIndex=" + endIndex + ",Size=" + size + ",Segments=");
+		sb.append("Window[StartIndex=" + startIndex + ",EndIndex=" + endIndex + ",Size=" + size + ",Segments=");
 
 		for(Integer segmentSize : segmentBytes) {
 			sb.append(segmentSize);

@@ -104,6 +104,11 @@ public class HarAddHandler implements IHandler {
 			// Add to repository
 			WindowRepository.getInstance().addWindows(windows);
 
+			Logger.debug("Windows: ");
+			for(Window wind : windows) {
+				Logger.debug(wind.getSize() + ", ");
+			}
+
 			Logger.write("");
 			Logger.write("Created " + windows.size() + " windows from " +  fingerprint.size() + " segments for video " + vidTitle + "/" + vidLen + "/" + vidQuality);
 			Logger.write("------");

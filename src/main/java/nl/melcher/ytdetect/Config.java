@@ -17,7 +17,7 @@ public class Config {
 	/**
 	 * Size of sliding window frames.
 	 */
-	public static final int WINDOW_SIZE = 7;
+	public static final int WINDOW_SIZE = 1;
 
 	/**
 	 * Filter threshold for segments in bytes.
