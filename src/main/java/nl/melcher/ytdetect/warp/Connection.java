@@ -3,6 +3,7 @@ package nl.melcher.ytdetect.warp;
 import lombok.Getter;
 import nl.melcher.ytdetect.Config;
 import nl.melcher.ytdetect.VideoIdentifier;
+import nl.melcher.ytdetect.adu.AduLine;
 import nl.melcher.ytdetect.fingerprinting.Window;
 import nl.melcher.ytdetect.tui.utils.Logger;
 
@@ -15,6 +16,9 @@ import java.util.*;
  */
 public class Connection {
 
+	/**
+	 * Generation bonus score multiplier.
+	 */
 	private static final int BONUS = 2;
 
 	/**
@@ -26,6 +30,11 @@ public class Connection {
 	 * Identifier for the connection this warp works on.
 	 */
 	@Getter private String connectionAddr;
+
+	/**
+	 * Timestamp of first received ADU on this connection.
+	 */
+	@Getter private String firstAduTimestamp;
 
 	/**
 	 * Mapping candidate videos to their occurrence.
@@ -43,11 +52,16 @@ public class Connection {
 
 	/**
 	 * Push adudump input line and process.
-	 * @param segmentSize The size of an incoming video segment in bytes.
+	 * @param line An {@link AduLine} representing an incoming video segment.
 	 */
-	public void pushSegment(int segmentSize) {
+	public void pushSegment(AduLine line) {
 		// Process ADU segment
-		aduBytes.add(segmentSize);
+		aduBytes.add(line.getSize());
+
+		if(aduBytes.size() == 1) {
+			firstAduTimestamp = line.getTimestamp();
+		}
+
 		if(aduBytes.size() >= Config.WINDOW_SIZE) {
 			// We have at least one complete window. Calculate total size.
 			int startIndex = aduBytes.size() - (Config.WINDOW_SIZE);
@@ -110,7 +124,9 @@ public class Connection {
 		if(aduBytes.size() < Config.WINDOW_SIZE) {
 			Logger.write("No results to report for " + connectionAddr);
 		} else {
+			Logger.write("========================================================================");
 			Logger.write("Results for " + connectionAddr);
+			Logger.write("First ADU received: " + firstAduTimestamp);
 
 			// Remove any candidates ending up with 0 occurrences
 			List<VideoIdentifier> toBeRemoved = new ArrayList<>();

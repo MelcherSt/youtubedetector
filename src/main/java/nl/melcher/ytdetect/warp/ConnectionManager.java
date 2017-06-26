@@ -41,7 +41,7 @@ public class ConnectionManager {
 				Logger.debug("size: " + line.getSize());
 
 				// Process ADU segment
-				connection.pushSegment(line.getSize());
+				connection.pushSegment(line);
 			} else if (line.getType() == AduLine.InferredType.END) {
 				// Connection ends here. Close down warp.
 				connection.writeResults();

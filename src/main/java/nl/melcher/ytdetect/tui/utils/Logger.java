@@ -5,7 +5,7 @@ package nl.melcher.ytdetect.tui.utils;
  */
 public class Logger {
 	/** Control whether debug output is visible **/
-	private static final boolean VERBOSE = true;
+	private static final boolean VERBOSE = false;
 
 	public static void write(String message) {
 		System.out.println(message);
