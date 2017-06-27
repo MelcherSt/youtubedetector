@@ -1,14 +1,13 @@
-# Youtube Detector
-YouTube detector (ytdetector) is part of the research project "I know what you watched: fingerprinting YouTube video streams".
-It aims to detect YouTube videos playing over HTTPS-protected video streams using fingerprinting techniques. 
-Melcher © 2017
+# WARP Detector
+WARP detector is an implementation of the Wedge Arrangement Rewarding Pipeline or **WARP** algorithm. The WARP algorithm
+is part of the research project "I know what you watched: fingerprinting YouTube video streams".
+It aims to detect YouTube videos playing over HTTPS-protected video streams using video fingerprinting.
 
 ## Background 
  
  ### adudump
- YouTube Detector is meant to be used together with the *adudump* tool created by Dr. Jeff Terrell. Adudump is able to infer
- Application Data Unit (ADU) sizes from TCP segments. Ytdetector has a real-time mode in which adudump output can be 
- piped through to the detector for immediate detection.
+ The application is meant to be used together with the *adudump* tool created by Dr. Jeff Terrell. Adudump is able to infer
+ Application Data Unit (ADU) sizes from TCP segments. The application only accepts adudump output. 
  
  ### HTTP Archive (HAR)
  HAR files are used as input to determine the video segments. 
@@ -16,19 +15,18 @@ Melcher © 2017
  
  ### Video definition
  `videos.txt` contains a definition of the 20 most viewed YouTube videos. These videos are used as part of the research project. 
- Part of the definition includes the video's HAR file.
+ Part of the definition includes the video's HAR file. The HAR files themselves have not been added to the repository and need to
+ be captured by hand.
  
-## Implementation
-### Fingerprints
-A fingerprint is a collection of video segments. The identifier for a fingerprint is the sum of its segments. 
-The number of segments in a fingerprint is defined by the window size. Each fingerprint has an expected *next* fingerprint.
+ ## Implementation
+ The current implementation supports various window sizes. The default window size has been set to 1 (corresponds to a segment 1 to 1) 
+ as this has given the best results.
+ 
+ ## Usage
+ Capture HAR files for some YouTube videos. Process the HAR files by used in the `-a` switch in combination with some video information
+ or use the `-a` switch in combination with a file like `videos.txt`. After adding save all the fingerprints by typing `-s`.
+ Now one is able to process adudump output by typing `-r` and copy pasting the output into the program.
 
-### Detector algorithm
-The algorithm uses HTTP request sizes and their respective order to detect which video is playing. 
-It is loosely based on the idea of state machines - NFAs to be precisely. The detector algorithm is 
-initialized with the complete set of fingerprints generated from HAR file corresponding to a video. 
-After initialization, dectector is ready for ADU input. When the window size is first reached, processing 
-will start.
 
 
  
